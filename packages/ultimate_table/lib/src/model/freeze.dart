@@ -1,0 +1,1 @@
+enum FrozenSide { start, end }
