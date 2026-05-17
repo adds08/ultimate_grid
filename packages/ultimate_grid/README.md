@@ -1,4 +1,4 @@
-# Ultimate Table by CodeBigya
+# ultimate_grid
 
 A scalable, themable 2D data-grid package for Flutter — a free, open-source
 alternative aimed at being more capable than `pluto_grid` and more ergonomic
@@ -94,8 +94,10 @@ final controller = GridController(schema: schema, source: source);
 UltimateTable(controller: controller);
 ```
 
-For a fuller example see `lib/demo_ultimate.dart` in the host repo (mock
-inventory grid with sort, search, and freeze toggles).
+For a fuller gallery — financial sheet with merges, 100k-row async paging,
+search & filter UI, theme switcher with three presets — see the
+`example/` directory shipped with the package, or the host repo's
+`lib/examples/` (timesheets, budgets, 5 M-row stress test).
 
 ## Constraints
 

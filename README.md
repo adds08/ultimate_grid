@@ -124,6 +124,17 @@ In-app, each example has a **View source** button at the top-right
 of the content area — opens the example's `.dart` file in a
 selectable, copyable viewer.
 
+## License
+
+MIT — see [packages/ultimate_grid/LICENSE](packages/ultimate_grid/LICENSE).
+
+## Contributing
+
+Issues and PRs welcome. Read **[CONTRIBUTING.md](CONTRIBUTING.md)**
+first — it covers local setup, the PR checklist, commit conventions,
+and the design rules the package code lives under (no `Uint64List`,
+no widget-per-cell on the paint path, etc.).
+
 ## Status
 
 | Phase | What | State |

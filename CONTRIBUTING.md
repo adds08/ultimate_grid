@@ -42,14 +42,16 @@ relevant `pubspec.yaml`s.
 ## Run
 
 ```bash
-# Mark 85 timesheet (ported to UltimateTable)
+# Host repo: side-nav app with every example (timesheet, budget, datagrid,
+# spreadsheet, stress test).
 flutter run -t lib/main.dart
+flutter run -t lib/main.dart -d chrome    # web
 
-# Simple Ultimate Table demo (60-row inventory, sort, search, freeze)
-flutter run -t lib/demo_ultimate.dart
-
-# Both work on Chrome
-flutter run -t lib/demo_ultimate.dart -d chrome
+# Package's own example gallery (the four demos shipped with the package
+# on pub.dev: inventory, financial sheet, async paging, search & filters,
+# plus a theme switcher and mobile-preview toggle).
+cd packages/ultimate_grid/example
+flutter run -d chrome
 ```
 
 ## Test + lint
@@ -127,10 +129,9 @@ body.
 
 ## License
 
-The repo's license is **TBD before first publish**. By contributing you
-agree your work is released under the license eventually chosen for the
-package (currently expected to be MIT or Apache-2.0). If you have a
-preference, comment on the licensing issue when it opens.
+This project is **MIT-licensed** — see [packages/ultimate_grid/LICENSE](packages/ultimate_grid/LICENSE).
+By contributing you agree your contribution is released under the same
+MIT license.
 
 ## Code of conduct
 
