@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'screens/financial_sheet_screen.dart';
 import 'screens/inventory_screen.dart';
 
 void main() => runApp(const _App());
@@ -27,6 +28,14 @@ class _Home extends StatelessWidget {
             'Schema + MapGridDataSource + GridController + UltimateTable.',
         icon: Icons.inventory_2_outlined,
         builder: (_) => const InventoryScreen(),
+      ),
+      _DemoItem(
+        title: 'Financial sheet (merges + freeze)',
+        subtitle:
+            'Quarter header strip merged across months; top + bottom-frozen '
+            'header / totals rows; left-frozen region; right-frozen TOTAL.',
+        icon: Icons.calendar_view_month_outlined,
+        builder: (_) => const FinancialSheetScreen(),
       ),
     ];
 
