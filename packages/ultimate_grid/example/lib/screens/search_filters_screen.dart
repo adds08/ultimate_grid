@@ -4,7 +4,8 @@ import 'package:ultimate_grid/ultimate_grid.dart';
 import '_shared.dart';
 
 class SearchFiltersScreen extends StatefulWidget {
-  const SearchFiltersScreen({super.key});
+  final GridTheme theme;
+  const SearchFiltersScreen({super.key, this.theme = GridTheme.mark85});
 
   @override
   State<SearchFiltersScreen> createState() => _SearchFiltersScreenState();
@@ -108,11 +109,9 @@ class _SearchFiltersScreenState extends State<SearchFiltersScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Search & filters')),
-      body: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
+    return Padding(
+      padding: const EdgeInsets.all(12),
+      child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Wrap(
@@ -163,6 +162,7 @@ class _SearchFiltersScreenState extends State<SearchFiltersScreen> {
                 ),
                 child: UltimateTable(
                   controller: _controller,
+                  theme: widget.theme,
                   headerBuilder: (ctx, colId) =>
                       HeaderLabel(controller: _controller, colId: colId),
                   onHeaderTap: (cellCtx, colId) => showUltimateColumnMenu(
@@ -176,8 +176,7 @@ class _SearchFiltersScreenState extends State<SearchFiltersScreen> {
             _StatusBar(controller: _controller),
           ],
         ),
-      ),
-    );
+      );
   }
 }
 

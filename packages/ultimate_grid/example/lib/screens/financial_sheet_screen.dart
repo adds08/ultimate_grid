@@ -6,7 +6,8 @@ import 'package:ultimate_grid/ultimate_grid.dart';
 import '_shared.dart';
 
 class FinancialSheetScreen extends StatefulWidget {
-  const FinancialSheetScreen({super.key});
+  final GridTheme theme;
+  const FinancialSheetScreen({super.key, this.theme = GridTheme.mark85});
 
   @override
   State<FinancialSheetScreen> createState() => _FinancialSheetScreenState();
@@ -133,11 +134,9 @@ class _FinancialSheetScreenState extends State<FinancialSheetScreen> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: const Text('Financial sheet (merges + freeze)')),
-        body: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Column(
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Wrap(
@@ -176,11 +175,13 @@ class _FinancialSheetScreenState extends State<FinancialSheetScreen> {
                     color: Colors.white,
                     border: Border.all(color: const Color(0xFFE2E8F0)),
                   ),
-                  child: UltimateTable(controller: _controller),
+                  child: UltimateTable(
+                    controller: _controller,
+                    theme: widget.theme,
+                  ),
                 ),
               ),
             ],
           ),
-        ),
-      );
+        );
 }

@@ -4,7 +4,8 @@ import 'package:ultimate_grid/ultimate_grid.dart';
 import '_shared.dart';
 
 class AsyncPagingScreen extends StatefulWidget {
-  const AsyncPagingScreen({super.key});
+  final GridTheme theme;
+  const AsyncPagingScreen({super.key, this.theme = GridTheme.mark85});
 
   @override
   State<AsyncPagingScreen> createState() => _AsyncPagingScreenState();
@@ -124,11 +125,9 @@ class _AsyncPagingScreenState extends State<AsyncPagingScreen> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: const Text('Async paging (100k rows)')),
-        body: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Column(
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Wrap(
@@ -174,6 +173,7 @@ class _AsyncPagingScreenState extends State<AsyncPagingScreen> {
                   ),
                   child: UltimateTable(
                     controller: _controller,
+                    theme: widget.theme,
                     headerBuilder: (ctx, colId) =>
                         HeaderLabel(controller: _controller, colId: colId),
                   ),
@@ -181,6 +181,5 @@ class _AsyncPagingScreenState extends State<AsyncPagingScreen> {
               ),
             ],
           ),
-        ),
-      );
+        );
 }

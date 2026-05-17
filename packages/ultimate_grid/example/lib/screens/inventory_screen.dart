@@ -4,7 +4,8 @@ import 'package:ultimate_grid/ultimate_grid.dart';
 import '_shared.dart';
 
 class InventoryScreen extends StatefulWidget {
-  const InventoryScreen({super.key});
+  final GridTheme theme;
+  const InventoryScreen({super.key, this.theme = GridTheme.mark85});
 
   @override
   State<InventoryScreen> createState() => _InventoryScreenState();
@@ -104,11 +105,9 @@ class _InventoryScreenState extends State<InventoryScreen> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: const Text('Inventory (minimal)')),
-        body: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Column(
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const HelpBanner(
@@ -126,13 +125,13 @@ class _InventoryScreenState extends State<InventoryScreen> {
                   ),
                   child: UltimateTable(
                     controller: _controller,
+                    theme: widget.theme,
                     headerBuilder: (ctx, colId) =>
                         HeaderLabel(controller: _controller, colId: colId),
                   ),
                 ),
               ),
-            ],
-          ),
+          ],
         ),
       );
 }
