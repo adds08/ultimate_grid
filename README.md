@@ -1,4 +1,4 @@
-# ultimate_grid
+# Ultimate Grid
 
 A scalable, themable 2D data-grid package for Flutter — a free, open-source
 alternative aimed at being more capable than `pluto_grid` and more ergonomic
