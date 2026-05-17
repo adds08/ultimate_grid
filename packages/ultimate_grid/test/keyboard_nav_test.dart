@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ultimate_table/ultimate_table.dart';
+import 'package:ultimate_grid/ultimate_grid.dart';
 
 GridController _build() {
   final schema = GridSchema(

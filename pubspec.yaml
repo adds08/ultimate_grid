@@ -32,8 +32,8 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^1.0.8
-  ultimate_table:
-    path: packages/ultimate_table
+  ultimate_grid:
+    path: packages/ultimate_grid
 
 dev_dependencies:
   flutter_test:

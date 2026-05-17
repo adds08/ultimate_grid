@@ -19,7 +19,7 @@ custom render object, and the phase-per-commit policy work.
 
 ## What we'd rather avoid
 
-- Hard dependencies on `material` from inside `packages/ultimate_table/lib/src/`
+- Hard dependencies on `material` from inside `packages/ultimate_grid/lib/src/`
   (we only build on `widgets` + `services` + `painting`). One file
   (`column_menu.dart`) is a deliberate `material` exception; everything
   else should stay `widgets`-only.
@@ -33,7 +33,7 @@ custom render object, and the phase-per-commit policy work.
 git clone <repo>
 cd flutter_grid_package
 flutter pub get                                  # host app
-cd packages/ultimate_table && flutter pub get    # package
+cd packages/ultimate_grid && flutter pub get    # package
 ```
 
 You'll need Flutter ≥ 3.24 and Dart ≥ 3.9. Both are pinned in the
@@ -57,7 +57,7 @@ flutter run -t lib/demo_ultimate.dart -d chrome
 Always run the package tests + analyzer before opening a PR:
 
 ```bash
-cd packages/ultimate_table
+cd packages/ultimate_grid
 flutter analyze    # must report "No issues found"
 flutter test       # must be all green
 ```
@@ -97,19 +97,19 @@ body.
 - [ ] `flutter analyze` clean (package + host app).
 - [ ] `flutter test` green (package + host app).
 - [ ] If you added a public type to the package, it's exported from
-      `packages/ultimate_table/lib/ultimate_table.dart`.
+      `packages/ultimate_grid/lib/ultimate_grid.dart`.
 - [ ] If you changed behavior, there's a new test (or a modified one)
       that would have failed before your change.
 - [ ] `CHANGELOG.md` has an entry under the current phase's `Added /
       Changed / Fixed` section, **OR** the PR is folded into an in-flight
       phase commit.
-- [ ] No `Uint64List`, no `dart:io` inside `packages/ultimate_table/lib/`.
+- [ ] No `Uint64List`, no `dart:io` inside `packages/ultimate_grid/lib/`.
 - [ ] If the change touches paint, you've confirmed the demo still runs
       cleanly on Chrome with no console errors.
 
 ## File layout reminders
 
-- `packages/ultimate_table/lib/` — the publishable package.
+- `packages/ultimate_grid/lib/` — the publishable package.
 - `lib/` — example app (timesheet + simple demo).
 - `docs/` — architecture + design notes (this folder is for humans,
   not generated docs).

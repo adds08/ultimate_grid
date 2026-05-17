@@ -17,8 +17,8 @@ as a path dependency:
 
 ```yaml
 dependencies:
-  ultimate_table:
-    path: ../ultimate_table          # or wherever you keep it
+  ultimate_grid:
+    path: ../ultimate_grid          # or wherever you keep it
 ```
 
 Then `flutter pub get`.
@@ -500,7 +500,7 @@ The body widget already wires these into:
 For copy-to-clipboard from your own button:
 
 ```dart
-import 'package:ultimate_table/ultimate_table.dart';
+import 'package:ultimate_grid/ultimate_grid.dart';
 
 await GridClipboard.copySelection(controller);
 // or get the TSV without writing to the clipboard:
@@ -637,7 +637,7 @@ horizontal thumb.
 - Profile-mode is what matters. Debug-mode shows the worst case
   because of Flutter's debug-paint and assertion overhead.
 
-The `benchmark_test.dart` test (in `packages/ultimate_table/test/`)
+The `benchmark_test.dart` test (in `packages/ultimate_grid/test/`)
 exercises the headless pipeline and the paragraph cache at moderate
 scale. Run with `flutter test test/benchmark_test.dart` — it prints
 controller-build / sort / filter / search times to stdout.

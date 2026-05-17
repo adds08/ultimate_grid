@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ultimate_table/ultimate_table.dart';
+import 'package:ultimate_grid/ultimate_grid.dart';
 
 void main() => runApp(const _App());
 
@@ -8,7 +8,7 @@ class _App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
-        title: 'ultimate_table example',
+        title: 'ultimate_grid example',
         theme: ThemeData(useMaterial3: true),
         home: const _InventoryScreen(),
       );
@@ -98,7 +98,7 @@ class _InventoryScreenState extends State<_InventoryScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: const Text('ultimate_table — inventory')),
+        appBar: AppBar(title: const Text('ultimate_grid — inventory')),
         body: Padding(
           padding: const EdgeInsets.all(12),
           child: Container(

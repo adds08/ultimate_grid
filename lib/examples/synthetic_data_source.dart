@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:ultimate_table/ultimate_table.dart';
+import 'package:ultimate_grid/ultimate_grid.dart';
 
 /// A `GridDataSource` that synthesises cell values on demand from the row
 /// index, so it can host millions of rows without materialising every cell.

@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ultimate_table/ultimate_table.dart';
+import 'package:ultimate_grid/ultimate_grid.dart';
 
 void main() {
   group('RowLayout', () {

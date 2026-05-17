@@ -5,7 +5,7 @@ hosts two things side by side:
 
 1. **The Mark 85 timesheet demo** (`lib/main.dart`) — the original prototype
    the project started from. Kept untouched while the package is built.
-2. **The `ultimate_table` package** (`packages/ultimate_table/`) — *Ultimate
+2. **The `ultimate_grid` package** (`packages/ultimate_grid/`) — *Ultimate
    Table by CodeBigya*, a scalable, themable 2D data-grid for Flutter.
 
 Each phase is one isolated commit. Bugs surfaced after a phase are folded
@@ -13,7 +13,7 @@ back into that phase's commit, not added as separate fix commits, so any
 phase commit on its own is a clean working state.
 
 The repository's own version is tracked under `pubspec.yaml` (`version:`); the
-package's own version is tracked under `packages/ultimate_table/pubspec.yaml`.
+package's own version is tracked under `packages/ultimate_grid/pubspec.yaml`.
 
 ## [Phase 0] — Mark 85 timesheet scaffold + input polish
 
@@ -37,15 +37,15 @@ default `GridTheme`.
 - Enter / Numpad Enter commits and moves to next focus.
 - Esc cancels and restores the prior value.
 
-## [Phase 1] — `ultimate_table` headless model
+## [Phase 1] — `ultimate_grid` headless model
 
-Bootstrapped the `ultimate_table` package — *Ultimate Table by CodeBigya* —
+Bootstrapped the `ultimate_grid` package — *Ultimate Table by CodeBigya* —
 as a path dependency of the example app. Phase 1 ships **no rendering**: it's
 the headless data model and view-state controller that subsequent phases
 build on. 24 unit tests cover the contract.
 
 ### Added
-- New package at `packages/ultimate_table/` with strict-cast analyzer options.
+- New package at `packages/ultimate_grid/` with strict-cast analyzer options.
 - `CellValue` sealed hierarchy: `Empty / Number / Text / Bool / Date / Formula / Custom`. `EmptyCell.instance` is the singleton missing-cell sentinel.
 - `CellAddress`, `RowId`, `ColId` (typedefs over `String`).
 - `ColumnSpec` (with `CellKind`, default width, freeze + freeze-priority, sortable/filterable flags, free-form tag) and `RowSpec`.
@@ -80,10 +80,10 @@ makes it possible to verify each future phase visually.
 - `UltimateTable` widget — composes the 9 regions, wires synced horizontal/vertical scrolling, draws selection fill + search highlight on top of cell content, virtualizes the middle via `ListView.builder`.
 - `UltimateTableHeader` helper widget — header row driven by `GridController.columnLayout` for callers that don't need a custom sortable header.
 - `lib/demo_ultimate.dart` — **standalone simple demo** at `flutter run -t lib/demo_ultimate.dart`. 60-row product inventory, 10 typed columns, click-header-to-sort (asc → desc → off), search box, and chip toggles for left-freezing SKU + Product and right-freezing Margin. Replaces the prior "timesheet is the only demo" friction.
-- Two more test files (29 total): `row_layout_test.dart` and `ultimate_table_widget_test.dart` (smoke tests: header rendering, cell value rendering, right-frozen column visibility).
+- Two more test files (29 total): `row_layout_test.dart` and `ultimate_grid_widget_test.dart` (smoke tests: header rendering, cell value rendering, right-frozen column visibility).
 
 ### Changed
-- `packages/ultimate_table/lib/ultimate_table.dart` barrel exports the new `row_layout`, `grid_theme`, `cell_renderer`, `default_renderers`, and `ultimate_table` widget surface.
+- `packages/ultimate_grid/lib/ultimate_grid.dart` barrel exports the new `row_layout`, `grid_theme`, `cell_renderer`, `default_renderers`, and `ultimate_grid` widget surface.
 
 ## [Phase 3] — Custom `RenderObject` body + paragraph cache + overlay editor
 
@@ -93,7 +93,7 @@ API of `UltimateTable` is unchanged — the demo runs the same way, but the
 body region no longer allocates a widget tree per cell.
 
 ### Added
-- `RenderUltimateBody` (`packages/ultimate_table/lib/src/view/render_body.dart`)
+- `RenderUltimateBody` (`packages/ultimate_grid/lib/src/view/render_body.dart`)
   — custom `RenderBox` that paints body cells directly. Binary-search culls
   rows outside the viewport using the precomputed `RowLayout.middleOffsets`;
   per-slice column offsets are precomputed once and reused.
@@ -120,13 +120,13 @@ body region no longer allocates a widget tree per cell.
   `UltimateBody` in a `SingleChildScrollView` and stacks the overlay editor
   on top when the editing cell belongs to that slice.
 - Frozen-row strips remain widget-based (small row counts, simpler).
-- The `ultimate_table` barrel now exports `ParagraphCache`, `BodyCellHit`,
+- The `ultimate_grid` barrel now exports `ParagraphCache`, `BodyCellHit`,
   and `UltimateBody`.
 
 ### Tests (5 added — 34 total)
 - `paragraph_cache_test.dart` — identity on repeat lookup, LRU eviction,
   `clear()` empties the cache.
-- `ultimate_table_widget_test.dart` — assertions ported to the custom
+- `ultimate_grid_widget_test.dart` — assertions ported to the custom
   body path (controller-derived assertions for body cells; header text
   still findable as widgets). New cases: tap opens overlay editor for
   text/number cells; tap toggles a bool cell without opening the editor.
@@ -140,12 +140,12 @@ ships so users can widen or narrow columns by dragging the right edge.
 Cmd/Ctrl+C copies the current selection to the system clipboard as TSV.
 
 ### Added
-- `MergeRange` (`packages/ultimate_table/lib/src/model/merge.dart`) —
+- `MergeRange` (`packages/ultimate_grid/lib/src/model/merge.dart`) —
   declarative cell merge addressed by `(anchorRow, anchorCol, rowSpan,
   colSpan)`. Stable across data revisions; references schema ids.
 - `MapGridDataSource.addMerge / removeMerge / clearMerges` — sparse,
   lazily-allocated merge list. Zero per-cell cost when unused.
-- `MergeIndex` (`packages/ultimate_table/lib/src/controller/merge_index.dart`)
+- `MergeIndex` (`packages/ultimate_grid/lib/src/controller/merge_index.dart`)
   — derived occlusion structure built once per controller revision. Uses
   a `Uint32List` bitset (web-safe). `anchorAt(viewRow, flatCol)` and
   `isOccluded(viewRow, flatCol)` are the two lookups consumed by paint.
@@ -165,7 +165,7 @@ Cmd/Ctrl+C copies the current selection to the system clipboard as TSV.
   selection (or its bounding rectangle when non-contiguous) as TSV that
   round-trips with Excel / Numbers / Sheets. `Tab` and newline characters
   inside cells are sanitized.
-- `UltimateResizableHeader` (`packages/ultimate_table/lib/src/view/resizable_header.dart`)
+- `UltimateResizableHeader` (`packages/ultimate_grid/lib/src/view/resizable_header.dart`)
   — drop-in replacement for `UltimateTableHeader` that ships a right-edge
   drag handle per column (`SystemMouseCursors.resizeColumn`) and exposes
   `onTapColumn` / `onLongPressColumn` for downstream sort / menu UIs.
@@ -201,7 +201,7 @@ search field, and the ability to hide columns or resize them to fit
 their widest visible value.
 
 ### Added
-- `Filters` helpers (`packages/ultimate_table/lib/src/filter_sort/filters.dart`)
+- `Filters` helpers (`packages/ultimate_grid/lib/src/filter_sort/filters.dart`)
   — `Filters.textContains`, `Filters.oneOf`, `Filters.numberRange`,
   `Filters.where`. Returned predicates plug straight into
   `controller.setFilter`.
@@ -315,7 +315,7 @@ regressions in controller-build / sort / filter / paragraph cache.
 - Body region wraps its vertical `SingleChildScrollView` in a
   `RawScrollbar` (6 px thumb, rounded). Visible on hover/scroll without
   pulling in `material`.
-- `packages/ultimate_table/test/benchmark_test.dart` — headless
+- `packages/ultimate_grid/test/benchmark_test.dart` — headless
   benchmark scenarios: build a 10k × 20 controller + run a full
   filter/sort/search cycle; hot-loop the paragraph cache with 100
   distinct strings × 1000 lookups. Loose timing ceilings (×5 the
@@ -353,7 +353,7 @@ needed explicit support: async / paginated data, and a richer
 spreadsheet showcase (merged cells + multi-axis selection + mobile).
 
 ### Added — package
-- `AsyncGridDataSource` (`packages/ultimate_table/lib/src/source/async_grid_data_source.dart`)
+- `AsyncGridDataSource` (`packages/ultimate_grid/lib/src/source/async_grid_data_source.dart`)
   — caller provides a `Future<AsyncPage> fetchRange(start, end)`
   callback and a `pageSize`. When the grid asks for a cell whose page
   hasn't loaded yet, the source returns a loading placeholder
@@ -467,7 +467,7 @@ audience would actually use:
   overlays now work in the middle (scrollable) region too.
 
 ### Tests (1 added — 71 total)
-- `ultimate_table_widget_test.dart` — split the single-cell-tap test
+- `ultimate_grid_widget_test.dart` — split the single-cell-tap test
   into a "single-tap selects + focuses" assertion and a separate
   "double-tap opens editor" assertion. Bool-toggle test bumped past
   the double-tap timeout. Keyboard nav tests use
@@ -830,8 +830,8 @@ The package was feature-complete after Phase 19 but had never been
 through a publish-prep pass. Three real bugs surfaced during the
 audit and got folded into this phase.
 
-### Fixed — `packages/ultimate_table/`
-- **`headerH` type mismatch** in `view/ultimate_table.dart`. The
+### Fixed — `packages/ultimate_grid/`
+- **`headerH` type mismatch** in `view/ultimate_grid.dart`. The
   conditional yielded `int` when no header was set and `double` when
   one was, leaving the result as `num` which then mixed badly with
   the layout arithmetic. Tightened to an explicit `double`.
@@ -853,13 +853,13 @@ audit and got folded into this phase.
   the buffer.
 
 ### Added — publish prep
-- **`LICENSE`** under `packages/ultimate_table/` — MIT.
-- **`CHANGELOG.md`** under `packages/ultimate_table/` — package-
+- **`LICENSE`** under `packages/ultimate_grid/` — MIT.
+- **`CHANGELOG.md`** under `packages/ultimate_grid/` — package-
   level history (separate from this repo-level changelog).
-- **`example/`** under `packages/ultimate_table/` — minimal
+- **`example/`** under `packages/ultimate_grid/` — minimal
   60-row inventory grid that pub.dev surfaces as the runnable
   example for the package page.
-- **`pubspec.yaml`** under `packages/ultimate_table/` —
+- **`pubspec.yaml`** under `packages/ultimate_grid/` —
   description tightened, `publish_to: 'none'` removed,
   `topics:` added (`grid`, `table`, `datagrid`, `spreadsheet`,
   `timesheet`). `homepage` / `repository` / `issue_tracker` are

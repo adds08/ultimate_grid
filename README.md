@@ -56,8 +56,8 @@ flutter_grid_package/
 │   ├── widgets/                   timesheet support code
 │   ├── data/  models/  state/  theme/
 └── packages/
-    └── ultimate_table/            the package itself
-        ├── lib/                   public API (lib/ultimate_table.dart barrel)
+    └── ultimate_grid/            the package itself
+        ├── lib/                   public API (lib/ultimate_grid.dart barrel)
         └── test/                  unit + widget tests
 ```
 
@@ -89,7 +89,7 @@ the app bar.
 ## Run the package tests
 
 ```bash
-cd packages/ultimate_table
+cd packages/ultimate_grid
 flutter test
 ```
 
@@ -129,7 +129,7 @@ selectable, copyable viewer.
 | Phase | What | State |
 |-------|------|-------|
 | 0 | Mark 85 timesheet scaffold + input polish | Shipped |
-| 1 | `ultimate_table` headless model + controller | Shipped |
+| 1 | `ultimate_grid` headless model + controller | Shipped |
 | 2 | 9-region widget grid + simple demo | Shipped |
 | 3 | Custom `RenderObject` body for millions-of-cells perf | Shipped |
 | 4 | Selection, merging, column/row reorder + resize | Shipped |

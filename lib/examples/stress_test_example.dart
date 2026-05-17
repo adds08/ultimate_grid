@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ultimate_table/ultimate_table.dart';
+import 'package:ultimate_grid/ultimate_grid.dart';
 
 import 'synthetic_data_source.dart';
 

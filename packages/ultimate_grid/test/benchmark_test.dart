@@ -1,4 +1,4 @@
-/// Lightweight benchmark harness for ultimate_table's headless data layer.
+/// Lightweight benchmark harness for ultimate_grid's headless data layer.
 ///
 /// Run with:
 ///     flutter test test/benchmark_test.dart
@@ -10,10 +10,10 @@ library;
 
 import 'package:flutter/painting.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ultimate_table/ultimate_table.dart';
+import 'package:ultimate_grid/ultimate_grid.dart';
 
 void main() {
-  group('ultimate_table benchmarks (headless)', () {
+  group('ultimate_grid benchmarks (headless)', () {
     test('build controller + run pipeline over 10k rows × 20 cols', () {
       const rowCount = 10000;
       const colCount = 20;

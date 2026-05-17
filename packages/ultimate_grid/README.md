@@ -67,7 +67,7 @@ cells without jitter on low-end devices.
 ## Quick start
 
 ```dart
-import 'package:ultimate_table/ultimate_table.dart';
+import 'package:ultimate_grid/ultimate_grid.dart';
 
 final schema = GridSchema(
   columns: const [

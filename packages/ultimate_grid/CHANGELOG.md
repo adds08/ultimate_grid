@@ -2,7 +2,7 @@
 
 ## 0.1.0 — Initial release
 
-First public release of `ultimate_table` — a scalable, themable 2D
+First public release of `ultimate_grid` — a scalable, themable 2D
 data-grid for Flutter.
 
 ### Highlights

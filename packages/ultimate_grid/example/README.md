@@ -1,6 +1,6 @@
-# ultimate_table — minimal example
+# ultimate_grid — minimal example
 
-The smallest runnable shape of `ultimate_table`: a schema, an in-memory
+The smallest runnable shape of `ultimate_grid`: a schema, an in-memory
 `MapGridDataSource`, a `GridController`, and an `UltimateTable`. Drop
 into a Flutter app and it renders a 60-row × 4-column inventory grid
 with the SKU column frozen on the left.

@@ -3,10 +3,10 @@
 This doc explains how a frame is drawn, how state flows from `GridController`
 into the render layer, and what each module owns. It's the "how it works"
 companion to the public-API `README.md`. New contributors should read this
-once before touching anything inside `packages/ultimate_table/lib/src/`.
+once before touching anything inside `packages/ultimate_grid/lib/src/`.
 
 If you're looking for "how do I build a grid?" see
-[`packages/ultimate_table/README.md`](../packages/ultimate_table/README.md).
+[`packages/ultimate_grid/README.md`](../packages/ultimate_grid/README.md).
 If you're looking for "what changed in each release?" see
 [`CHANGELOG.md`](../CHANGELOG.md).
 
@@ -15,8 +15,8 @@ If you're looking for "what changed in each release?" see
 ## Module map
 
 ```
-packages/ultimate_table/lib/
-├── ultimate_table.dart                # public barrel — every type a caller
+packages/ultimate_grid/lib/
+├── ultimate_grid.dart                # public barrel — every type a caller
 │                                      # touches is exported from here
 └── src/
     ├── model/         CellValue, CellAddress, ColumnSpec, RowSpec,
@@ -196,7 +196,7 @@ These are baked into the design; please read them before refactoring.
    most cosmetics just need a notify).
 2. Expose a getter.
 3. Wire the renderer (likely `RenderUltimateBody.paint`) to consult it.
-4. Add a test under `packages/ultimate_table/test/` matching an existing
+4. Add a test under `packages/ultimate_grid/test/` matching an existing
    shape (see `selection_test.dart` for controller-state tests).
 5. Update the package barrel only if you exposed new types.
 
@@ -246,7 +246,7 @@ phase is already pushed, ask reviewers whether to roll back and fold.
 
 ## Tests
 
-`packages/ultimate_table/test/` is split by feature:
+`packages/ultimate_grid/test/` is split by feature:
 
 - `grid_data_source_test.dart` — sparse cells + metadata, revision bump
 - `grid_controller_test.dart` — initial layout, freeze, reorder, source
@@ -264,7 +264,7 @@ phase is already pushed, ask reviewers whether to roll back and fold.
 - `filters_test.dart` — `Filters.*`, `hideColumn`, `SearchMode.filter`,
   `fitColumnToText`
 - `paragraph_cache_test.dart` — LRU identity + eviction
-- `ultimate_table_widget_test.dart` — body mounts, frozen-column
+- `ultimate_grid_widget_test.dart` — body mounts, frozen-column
   partitioning, editor open, bool toggle
 - `search_field_test.dart` — typing + mode toggle
 - `resizable_header_test.dart` — drag widens column, tap fires callback
@@ -276,7 +276,7 @@ phase is already pushed, ask reviewers whether to roll back and fold.
 Run all with:
 
 ```bash
-cd packages/ultimate_table
+cd packages/ultimate_grid
 flutter analyze && flutter test
 ```
 
@@ -299,7 +299,7 @@ Before merging anything that touches `lib/src/`:
 
 ## Dependencies
 
-### Package (`packages/ultimate_table`)
+### Package (`packages/ultimate_grid`)
 
 | Package | Why we depend on it |
 |---|---|
@@ -324,19 +324,19 @@ Deliberate non-dependencies (kept out so the package stays small):
 |---|---|
 | `flutter` (SDK) | Material app shell, demo UI. |
 | `cupertino_icons` ^1.0.8 | Icon set used by the timesheet toolbar. |
-| `ultimate_table` (path:) | The package under test. |
+| `ultimate_grid` (path:) | The package under test. |
 
 ---
 
 ## Where to start reading the code
 
-1. [`packages/ultimate_table/lib/ultimate_table.dart`](../packages/ultimate_table/lib/ultimate_table.dart)
+1. [`packages/ultimate_grid/lib/ultimate_grid.dart`](../packages/ultimate_grid/lib/ultimate_grid.dart)
    — the public surface.
-2. [`packages/ultimate_table/lib/src/controller/grid_controller.dart`](../packages/ultimate_table/lib/src/controller/grid_controller.dart)
+2. [`packages/ultimate_grid/lib/src/controller/grid_controller.dart`](../packages/ultimate_grid/lib/src/controller/grid_controller.dart)
    — `_rebuildDerived` is the heart of the data flow.
-3. [`packages/ultimate_table/lib/src/view/ultimate_table.dart`](../packages/ultimate_table/lib/src/view/ultimate_table.dart)
+3. [`packages/ultimate_grid/lib/src/view/ultimate_grid.dart`](../packages/ultimate_grid/lib/src/view/ultimate_grid.dart)
    — the `LayoutBuilder` that becomes the 3×3 region tree.
-4. [`packages/ultimate_table/lib/src/view/render_body.dart`](../packages/ultimate_table/lib/src/view/render_body.dart)
+4. [`packages/ultimate_grid/lib/src/view/render_body.dart`](../packages/ultimate_grid/lib/src/view/render_body.dart)
    — the custom render object that paints body cells.
 5. [`lib/widgets/timesheet_grid.dart`](../lib/widgets/timesheet_grid.dart)
    — a real-world consumer (worker rows + cost-code columns + frozen

@@ -1,5 +1,5 @@
-name: ultimate_table_example
-description: "Minimal example for ultimate_table — a 60-row inventory grid."
+name: ultimate_grid_example
+description: "Example app for ultimate_grid — inventory, financial sheet, async paging, merges, search and filters."
 publish_to: 'none'
 version: 0.1.0
 
@@ -10,7 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  ultimate_table:
+  ultimate_grid:
     path: ../
 
 dev_dependencies:

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ultimate_table/ultimate_table.dart';
+import 'package:ultimate_grid/ultimate_grid.dart';
 
 /// Help banner used by every example to point users at what to try.
 class HelpBanner extends StatelessWidget {

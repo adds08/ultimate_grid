@@ -1,6 +1,6 @@
 import 'package:flutter/painting.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ultimate_table/src/view/paragraph_cache.dart';
+import 'package:ultimate_grid/src/view/paragraph_cache.dart';
 
 void main() {
   group('ParagraphCache', () {
