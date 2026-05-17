@@ -16,6 +16,9 @@ import 'selection.dart';
 /// mutating the view goes through [GridController]. Both bump revisions
 /// independently so renderers only repaint what changed.
 class GridController extends ChangeNotifier {
+  /// Builds a controller bound to a [schema] + [source]. Seeds column /
+  /// row widths and freeze sides from the schema's defaults and subscribes
+  /// to the source so data mutations rebuild derived state automatically.
   GridController({required this.schema, required this.source}) {
     _columnOrder = [for (final c in schema.columns) c.id];
     for (final c in schema.columns) {
@@ -40,7 +43,13 @@ class GridController extends ChangeNotifier {
     _rebuildDerived();
   }
 
+  /// The schema this controller was constructed with. Read-only — build a
+  /// new controller if the schema shape changes.
   final GridSchema schema;
+
+  /// The data source this controller is bound to. The controller listens
+  /// on it; cell mutations through `source.setValue` bump the controller's
+  /// derived state automatically.
   final GridDataSource source;
 
   // --- raw state ---
@@ -70,32 +79,84 @@ class GridController extends ChangeNotifier {
   int _revision = 0;
 
   // --- accessors ---
+
+  /// Monotonic counter bumped on every mutation. Renderers can compare it
+  /// across frames to decide whether their cached layout is still valid.
   int get revision => _revision;
+
+  /// The current selection state. Mutate via [setSelection], [selectCell],
+  /// [extendSelectionTo], etc. — never reassign the field directly.
   Selection get selection => _selection;
+
+  /// Precomputed column partition (start-frozen / scrollable / end-frozen)
+  /// + cumulative offsets. Rebuilt once per revision, not per frame.
   ColumnLayout get columnLayout => _columnLayout;
+
+  /// Precomputed row partition (top-frozen / middle / bottom-frozen) +
+  /// cumulative offsets. Frozen rows skip the filter / sort pipeline so
+  /// they remain stable across view changes.
   RowLayout get rowLayout => _rowLayout;
+
+  /// Output of the single-pass view pipeline (filter -> sort -> search).
+  /// Contains the visible row-index list and the search-hit bitset that
+  /// the body renderer uses to draw highlights.
   ViewPipelineResult get pipelineResult => _pipelineResult;
+
+  /// Computed merge layout for the current view. Tracks which cells are
+  /// occluded by a [MergeRange] anchor so the body skips them.
   MergeIndex get mergeIndex => _mergeIndex;
 
+  /// Current visible column order. Reflects [reorderColumn] calls and
+  /// hides. Read-only view — call [reorderColumn] to mutate.
   List<ColId> get columnOrder => List.unmodifiable(_columnOrder);
+
+  /// Active sort keys in priority order (first = primary). Mutate via
+  /// [setSortKeys]; pass `const []` to clear.
   List<SortKey> get sortKeys => List.unmodifiable(_sortKeys);
+
+  /// Active filters keyed by column id. Mutate via [setFilter]; pass
+  /// `null` as the predicate to clear one column.
   Map<ColId, FilterPredicate> get filters => Map.unmodifiable(_filters);
+
+  /// Current search query string. Empty means no search active.
   String get searchQuery => _searchQuery;
+
+  /// Whether the search query [searchMode] matches by highlight or by
+  /// filter. See [SearchMode] for the two modes.
   SearchMode get searchMode => _searchMode;
+
+  /// Columns hidden via [hideColumn]. Hidden columns disappear from
+  /// layout but stay in the schema and data source.
   Set<ColId> get hiddenColumns => Set.unmodifiable(_hiddenColumns);
+
+  /// Whether column [id] is currently hidden via [hideColumn].
   bool isColumnHidden(ColId id) => _hiddenColumns.contains(id);
 
+  /// Effective width of column [id]. Falls back to the schema's
+  /// [ColumnSpec.defaultWidth], then to 120 if no spec exists.
   double widthOf(ColId id) =>
       _columnWidths[id] ?? schema.column(id)?.defaultWidth ?? 120;
+
+  /// Effective freeze side of column [id], or `null` if scrollable.
   FrozenSide? freezeOf(ColId id) => _columnFreezes[id];
+
+  /// Effective pin priority of column [id] among same-side frozen
+  /// columns. Lower values render closer to the outside edge.
   int freezePriorityOf(ColId id) =>
       _columnFreezePriorities[id] ??
       schema.column(id)?.defaultFreezePriority ??
       0;
 
+  /// Effective height of row [id]. Falls back to the schema's
+  /// `RowSpec.defaultHeight`, then to 44 if no spec exists.
   double heightOf(RowId id) =>
       _rowHeights[id] ?? schema.row(id)?.defaultHeight ?? 44;
+
+  /// Effective freeze side of row [id], or `null` if scrollable.
   FrozenSide? rowFreezeOf(RowId id) => _rowFreezes[id];
+
+  /// Effective pin priority of row [id] among same-side frozen rows.
+  /// Lower values render closer to the outside edge of the strip.
   int rowFreezePriorityOf(RowId id) =>
       _rowFreezePriorities[id] ??
       schema.row(id)?.defaultFreezePriority ??
@@ -130,6 +191,9 @@ class GridController extends ChangeNotifier {
   }
 
   // --- mutations: columns ---
+
+  /// Sets the width of column [id]. Clamped up to the spec's `minWidth`
+  /// (default 40). No-op if the width is unchanged.
   void setColumnWidth(ColId id, double width) {
     final spec = schema.column(id);
     final clamped = width < (spec?.minWidth ?? 40) ? (spec?.minWidth ?? 40) : width;
@@ -138,6 +202,9 @@ class GridController extends ChangeNotifier {
     _bump(rebuildLayout: true);
   }
 
+  /// Pins column [id] to [side] (or unpins when `null`) with the given
+  /// [priority] among same-side frozen columns. Lower priority renders
+  /// closer to the outside edge.
   void setColumnFreeze(ColId id, FrozenSide? side, {int priority = 0}) {
     if (side == null) {
       _columnFreezes.remove(id);
@@ -149,12 +216,15 @@ class GridController extends ChangeNotifier {
     _bump(rebuildLayout: true);
   }
 
+  /// Hides column [id] from the visible layout. The schema and data
+  /// source are untouched; pair with [showColumn] to restore.
   void hideColumn(ColId id) {
     if (_hiddenColumns.add(id)) {
       _bump(rebuildLayout: true);
     }
   }
 
+  /// Re-shows column [id] previously hidden via [hideColumn].
   void showColumn(ColId id) {
     if (_hiddenColumns.remove(id)) {
       _bump(rebuildLayout: true);
@@ -173,12 +243,16 @@ class GridController extends ChangeNotifier {
   }
 
   // --- mutations: rows ---
+
+  /// Sets the height of row [id] in logical pixels. No-op if unchanged.
   void setRowHeight(RowId id, double height) {
     if (_rowHeights[id] == height) return;
     _rowHeights[id] = height;
     _bump(rebuildLayout: true);
   }
 
+  /// Pins row [id] to [side] (or unpins when `null`) with the given
+  /// [priority] among same-side frozen rows.
   void setRowFreeze(RowId id, FrozenSide? side, {int priority = 0}) {
     if (side == null) {
       _rowFreezes.remove(id);
@@ -206,12 +280,16 @@ class GridController extends ChangeNotifier {
   }
 
   // --- mutations: selection ---
+
+  /// Replaces the current selection wholesale. No-op if [next] is the
+  /// same instance as the current selection.
   void setSelection(Selection next) {
     if (identical(next, _selection)) return;
     _selection = next;
     _bump();
   }
 
+  /// Clears the selection. Equivalent to `setSelection(Selection.empty)`.
   void clearSelection() => setSelection(Selection.empty);
 
   /// Set the selection to a single cell.
@@ -273,6 +351,9 @@ class GridController extends ChangeNotifier {
   }
 
   // --- mutations: sort / filter / search ---
+
+  /// Replaces the active sort keys with [keys] (first = primary). Pass
+  /// `const []` to clear sorting and return to the source's natural order.
   void setSortKeys(List<SortKey> keys) {
     _sortKeys
       ..clear()
@@ -280,6 +361,9 @@ class GridController extends ChangeNotifier {
     _bump(rebuildPipeline: true);
   }
 
+  /// Sets the filter predicate for column [id], or clears it when
+  /// [predicate] is `null`. Build predicates with the helpers in
+  /// `Filters.*`.
   void setFilter(ColId id, FilterPredicate? predicate) {
     if (predicate == null) {
       _filters.remove(id);
@@ -289,12 +373,17 @@ class GridController extends ChangeNotifier {
     _bump(rebuildPipeline: true);
   }
 
+  /// Updates the global search query. Cells whose string form contains
+  /// [query] are marked as hits; whether they're highlighted or filter
+  /// non-matches depends on [searchMode].
   void setSearchQuery(String query) {
     if (_searchQuery == query) return;
     _searchQuery = query;
     _bump(rebuildPipeline: true);
   }
 
+  /// Switches between [SearchMode.highlight] (keep every row, mark hits)
+  /// and [SearchMode.filter] (drop rows with no hits).
   void setSearchMode(SearchMode mode) {
     if (_searchMode == mode) return;
     _searchMode = mode;
