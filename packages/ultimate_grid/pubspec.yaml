@@ -2,13 +2,9 @@ name: ultimate_grid
 description: "Scalable, themable 2D data-grid for Flutter — 9-region freeze, canvas-paint body, merges, async data, selection, sort, filter, search."
 version: 0.1.0
 
-# TODO(adds08): set real URLs before publishing. Pub.dev resolves these to
-# the "Homepage", "Repository", and "Issue tracker" links on the package
-# page. The package itself lives under packages/ultimate_grid/ in the
-# host monorepo.
-# homepage: https://github.com/adds08/flutter_grid_package
-# repository: https://github.com/adds08/flutter_grid_package/tree/main/packages/ultimate_grid
-# issue_tracker: https://github.com/adds08/flutter_grid_package/issues
+homepage: https://github.com/adds08/flutter_grid_package
+repository: https://github.com/adds08/flutter_grid_package/tree/main/packages/ultimate_grid
+issue_tracker: https://github.com/adds08/flutter_grid_package/issues
 
 topics:
   - grid
