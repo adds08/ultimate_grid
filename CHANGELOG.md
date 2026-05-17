@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.1.1 — Docs polish
+
+- README H1 now reads "Ultimate Grid" (was `ultimate_grid`) so the
+  pub.dev page surfaces a product title rather than the snake-case
+  package id.
+- Restored the "Why this exists" origin section so the GitHub README
+  carries the package's history, lightly reframed to point at the
+  Office Time Log demo instead of the prior timesheet prototype.
+
+No code changes; the API surface is identical to 0.1.0.
+
 ## 0.1.0 — Initial release
 
 First public release of `ultimate_grid` — a scalable, themable 2D
