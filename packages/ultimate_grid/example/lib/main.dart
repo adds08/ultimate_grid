@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'screens/async_paging_screen.dart';
 import 'screens/financial_sheet_screen.dart';
 import 'screens/inventory_screen.dart';
 
@@ -36,6 +37,14 @@ class _Home extends StatelessWidget {
             'header / totals rows; left-frozen region; right-frozen TOTAL.',
         icon: Icons.calendar_view_month_outlined,
         builder: (_) => const FinancialSheetScreen(),
+      ),
+      _DemoItem(
+        title: 'Async paging (100k rows)',
+        subtitle:
+            'AsyncGridDataSource fetches pages on demand with a simulated '
+            'network delay. Loading placeholders flash, then become real cells.',
+        icon: Icons.cloud_download_outlined,
+        builder: (_) => const AsyncPagingScreen(),
       ),
     ];
 
