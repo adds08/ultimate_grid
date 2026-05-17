@@ -8,6 +8,49 @@ cells without jitter on low-end devices.
 > **Status:** in active development. The public API surface is stable for
 > Phase 3 (headless model + 9-region grid + custom `RenderObject` body).
 
+## Why this exists
+
+Around 2017–2020, I was a one-person stack working on a tablet app for a
+construction company. The headline screen was a timesheet — crews on one
+axis, cost codes on the other, hours in the middle, with phases and
+projects layered behind them in a relational backend. It was the most
+complex piece of UI I had built up to that point: cell mapping across
+schemas, multi-cell selection, multi-value entry, a custom on-screen
+keyboard, and the kind of state churn where every edit had to ripple into
+totals on the right and a quantity-to-claim band on the top. I was
+learning state management mid-flight; the code ended up a fan-out of
+providers and a backend that nested deeper than I'd like to admit. On the
+web side the same dataset was shown through a jQuery-driven
+`bootstrap-table` library, with PHP, SQL, CSS, the Flutter app, and the
+servers all sitting in the same week's todo list.
+
+I shipped it. It worked. It was also a stark reminder that Flutter, at
+the time, had no real grid ecosystem. `table_sticky_headers` covered the
+basic sticky-header case but wasn't flexible enough for where the
+timesheet was heading. When `TwoDimensional` arrived in the Flutter SDK
+a couple of years later I was hopeful — but it landed as a low-level
+building block, not a feature-grade grid, and the gap between "drawable
+viewport" and "actual datagrid" stayed wide.
+
+Between contract gigs over the next few years I kept the unfinished grid
+in a side folder. It was too unpolished to publish — there were always
+five missing pieces — and I never had the focused stretch to finish them.
+With AI-assisted overhauls over the last year, I was finally able to do
+the surgery the package needed: replace the external table dependency
+with the canvas-paint body it has today, keep the original mental model
+(rows and columns are both data, edges freeze, totals derive), and
+produce something I could share without embarrassment. The same time-log
+shape that motivated this package — people on one axis, work items on
+the other, hours per cell, frozen edges, derived totals — ships as the
+**Office Time Log** demo in `example/` today, reframed for IT-industry
+projects but hosted on the new engine.
+
+> Five clients later, the same package now ships under multiple production
+> apps. None of them are construction-shaped.
+
+This is the artifact of that journey: the grid I wanted in 2018, written
+through 2026, for everyone who's hit the same wall.
+
 ## What it does today (Phase 3)
 
 - **Matrix-map data model.** `GridDataSource` with sparse cell storage and a
