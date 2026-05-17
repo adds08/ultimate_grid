@@ -12,6 +12,11 @@ A home menu launches each demo. Shipped so far:
    50 on demand with a simulated network latency. Scroll fast to see
    "Loading…" placeholders flash before pages resolve. Drop-down adjusts
    the simulated latency.
+4. **Search & filters** — `UltimateSearchField` in Highlight ↔ Filter
+   mode + the per-column popup menu (`showUltimateColumnMenu`) with
+   sort / filter / pin / hide / fit. Filter dialog picks the right
+   input for the column kind: Contains for text/date, Min/Max for
+   numbers, true/false for bool.
 
 ```bash
 cd example

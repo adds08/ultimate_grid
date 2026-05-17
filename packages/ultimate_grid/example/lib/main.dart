@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'screens/async_paging_screen.dart';
 import 'screens/financial_sheet_screen.dart';
 import 'screens/inventory_screen.dart';
+import 'screens/search_filters_screen.dart';
 
 void main() => runApp(const _App());
 
@@ -45,6 +46,14 @@ class _Home extends StatelessWidget {
             'network delay. Loading placeholders flash, then become real cells.',
         icon: Icons.cloud_download_outlined,
         builder: (_) => const AsyncPagingScreen(),
+      ),
+      _DemoItem(
+        title: 'Search & filters',
+        subtitle:
+            'UltimateSearchField in Highlight ↔ Filter mode + per-column '
+            'filter dialogs reachable from the header menu.',
+        icon: Icons.search,
+        builder: (_) => const SearchFiltersScreen(),
       ),
     ];
 
