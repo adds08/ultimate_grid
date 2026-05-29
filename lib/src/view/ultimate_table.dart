@@ -38,6 +38,15 @@ class UltimateTable extends StatefulWidget {
   /// [MapGridDataSource]. Provide a callback to intercept (e.g. to validate).
   final void Function(RowId row, ColId col, CellValue newValue)? onCellCommit;
 
+  /// Called when a body row is tapped. Receives the [BuildContext] of the
+  /// tap location (useful for anchoring popups) and the tapped [RowId].
+  /// Fired after the default selection logic runs.
+  final void Function(BuildContext context, RowId rowId)? onRowTap;
+
+  /// Called when a body row is double-tapped. If [editable] is true the
+  /// overlay editor opens first; the callback fires afterwards.
+  final void Function(BuildContext context, RowId rowId)? onRowDoubleTap;
+
   /// Whether the body should open an overlay editor on tap. Defaults to true.
   final bool editable;
 
@@ -115,6 +124,8 @@ class UltimateTable extends StatefulWidget {
     this.renderers,
     this.emptyState,
     this.onCellCommit,
+    this.onRowTap,
+    this.onRowDoubleTap,
     this.editable = true,
     this.autofocus = false,
     this.widgetColumns = const <ColId>{},
@@ -893,16 +904,17 @@ class _UltimateTableState extends State<UltimateTable> {
       hit.colIndex,
       focus: CellAddress(hit.rowId, hit.colId),
     );
+    widget.onRowTap?.call(context, hit.rowId);
   }
 
   void _onBodyDoubleTap(BodyCellHit hit) {
-    if (!widget.editable) return;
-    final spec = widget.controller.schema.column(hit.colId);
-    if (spec?.kind == CellKind.bool_) {
-      // Already toggled by single tap; double-tap is a no-op here.
-      return;
+    if (widget.editable) {
+      final spec = widget.controller.schema.column(hit.colId);
+      if (spec?.kind != CellKind.bool_) {
+        _openEditor(hit, hit.localRect);
+      }
     }
-    _openEditor(hit, hit.localRect);
+    widget.onRowDoubleTap?.call(context, hit.rowId);
   }
 
   void _onBodyDragStart(BodyCellHit hit) {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ultimate_grid/ultimate_grid.dart';
+import 'package:ultimate_grid_example/screens/self_created_example.dart';
 
 import 'screens/_themes.dart';
 import 'screens/async_paging_screen.dart';
@@ -19,11 +20,11 @@ class _App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
-        title: 'ultimate_grid example',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(useMaterial3: true),
-        home: const _Shell(),
-      );
+    title: 'ultimate_grid example',
+    debugShowCheckedModeBanner: false,
+    theme: ThemeData(useMaterial3: true),
+    home: const _Shell(),
+  );
 }
 
 class _ExampleEntry {
@@ -31,12 +32,7 @@ class _ExampleEntry {
   final String subtitle;
   final IconData icon;
   final Widget Function(GridTheme theme) build;
-  const _ExampleEntry({
-    required this.label,
-    required this.subtitle,
-    required this.icon,
-    required this.build,
-  });
+  const _ExampleEntry({required this.label, required this.subtitle, required this.icon, required this.build});
 }
 
 final _examples = <_ExampleEntry>[
@@ -94,6 +90,7 @@ final _examples = <_ExampleEntry>[
     icon: Icons.speed_outlined,
     build: (_) => const StressTestExample(),
   ),
+  _ExampleEntry(label: 'Self', subtitle: 'Self Created Example', icon: Icons.speed_outlined, build: (_) => const SelfCreatedExample()),
 ];
 
 class _Shell extends StatefulWidget {
@@ -130,11 +127,8 @@ class _ShellState extends State<_Shell> {
           mobilePreview: _mobilePreview,
           onThemeChanged: (t) => setState(() => _themeName = t),
           onAccentChanged: (c) => setState(() => _accent = c),
-          onToggleMobile: () =>
-              setState(() => _mobilePreview = !_mobilePreview),
-          onOpenMenu: compact
-              ? () => Scaffold.of(_scaffoldContext!).openDrawer()
-              : null,
+          onToggleMobile: () => setState(() => _mobilePreview = !_mobilePreview),
+          onOpenMenu: compact ? () => Scaffold.of(_scaffoldContext!).openDrawer() : null,
         ),
         Expanded(
           child: KeyedSubtree(
@@ -156,13 +150,7 @@ class _ShellState extends State<_Shell> {
                 color: Colors.white,
                 border: Border.all(color: const Color(0xFFCBD5E1), width: 1),
                 borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.06),
-                    blurRadius: 16,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 16, offset: const Offset(0, 4))],
               ),
               clipBehavior: Clip.antiAlias,
               child: body,
@@ -187,26 +175,26 @@ class _ShellState extends State<_Shell> {
             )
           : null,
       body: SafeArea(
-        child: Builder(builder: (ctx) {
-          _scaffoldContext = ctx;
-          return compact
-              ? mobileFramed
-              : Row(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    _Sidebar(
-                      selected: _selected,
-                      collapsed: _sidebarCollapsed,
-                      onSelect: (i) => setState(() => _selected = i),
-                      onToggleCollapsed: () => setState(
-                          () => _sidebarCollapsed = !_sidebarCollapsed),
-                    ),
-                    const VerticalDivider(
-                        width: 1, color: Color(0xFFE2E8F0)),
-                    Expanded(child: mobileFramed),
-                  ],
-                );
-        }),
+        child: Builder(
+          builder: (ctx) {
+            _scaffoldContext = ctx;
+            return compact
+                ? mobileFramed
+                : Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _Sidebar(
+                        selected: _selected,
+                        collapsed: _sidebarCollapsed,
+                        onSelect: (i) => setState(() => _selected = i),
+                        onToggleCollapsed: () => setState(() => _sidebarCollapsed = !_sidebarCollapsed),
+                      ),
+                      const VerticalDivider(width: 1, color: Color(0xFFE2E8F0)),
+                      Expanded(child: mobileFramed),
+                    ],
+                  );
+          },
+        ),
       ),
     );
   }
@@ -219,12 +207,7 @@ class _Sidebar extends StatelessWidget {
   final bool collapsed;
   final ValueChanged<int> onSelect;
   final VoidCallback onToggleCollapsed;
-  const _Sidebar({
-    required this.selected,
-    required this.collapsed,
-    required this.onSelect,
-    required this.onToggleCollapsed,
-  });
+  const _Sidebar({required this.selected, required this.collapsed, required this.onSelect, required this.onToggleCollapsed});
 
   @override
   Widget build(BuildContext context) {
@@ -236,16 +219,9 @@ class _Sidebar extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _SidebarHeader(
-            collapsed: collapsed,
-            onToggleCollapsed: onToggleCollapsed,
-          ),
+          _SidebarHeader(collapsed: collapsed, onToggleCollapsed: onToggleCollapsed),
           Expanded(
-            child: _SidebarList(
-              selected: selected,
-              collapsed: collapsed,
-              onSelect: onSelect,
-            ),
+            child: _SidebarList(selected: selected, collapsed: collapsed, onSelect: onSelect),
           ),
         ],
       ),
@@ -256,29 +232,20 @@ class _Sidebar extends StatelessWidget {
 class _SidebarHeader extends StatelessWidget {
   final bool collapsed;
   final VoidCallback onToggleCollapsed;
-  const _SidebarHeader({
-    required this.collapsed,
-    required this.onToggleCollapsed,
-  });
+  const _SidebarHeader({required this.collapsed, required this.onToggleCollapsed});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: collapsed
-          ? const EdgeInsets.symmetric(horizontal: 8, vertical: 14)
-          : const EdgeInsets.fromLTRB(16, 18, 8, 12),
+      padding: collapsed ? const EdgeInsets.symmetric(horizontal: 8, vertical: 14) : const EdgeInsets.fromLTRB(16, 18, 8, 12),
       child: Row(
         children: [
           Container(
             width: 28,
             height: 28,
-            decoration: BoxDecoration(
-              color: const Color(0xFFEA580C),
-              borderRadius: BorderRadius.circular(6),
-            ),
+            decoration: BoxDecoration(color: const Color(0xFFEA580C), borderRadius: BorderRadius.circular(6)),
             alignment: Alignment.center,
-            child: const Icon(Icons.grid_view_rounded,
-                size: 16, color: Colors.white),
+            child: const Icon(Icons.grid_view_rounded, size: 16, color: Colors.white),
           ),
           if (!collapsed) ...[
             const SizedBox(width: 10),
@@ -288,21 +255,13 @@ class _SidebarHeader extends StatelessWidget {
                 children: [
                   Text(
                     'Ultimate Grid',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF0F172A),
-                    ),
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Color(0xFF0F172A)),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   Text(
                     'by CodeBigya · examples',
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: Color(0xFFC2410C),
-                      fontWeight: FontWeight.w500,
-                    ),
+                    style: TextStyle(fontSize: 11, color: Color(0xFFC2410C), fontWeight: FontWeight.w500),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -312,11 +271,7 @@ class _SidebarHeader extends StatelessWidget {
           ],
           IconButton(
             onPressed: onToggleCollapsed,
-            icon: Icon(
-              collapsed ? Icons.menu_open : Icons.menu,
-              size: 18,
-              color: const Color(0xFF64748B),
-            ),
+            icon: Icon(collapsed ? Icons.menu_open : Icons.menu, size: 18, color: const Color(0xFF64748B)),
             tooltip: collapsed ? 'Expand sidebar' : 'Collapse sidebar',
             visualDensity: VisualDensity.compact,
           ),
@@ -330,11 +285,7 @@ class _SidebarList extends StatelessWidget {
   final int selected;
   final bool collapsed;
   final ValueChanged<int> onSelect;
-  const _SidebarList({
-    required this.selected,
-    required this.collapsed,
-    required this.onSelect,
-  });
+  const _SidebarList({required this.selected, required this.collapsed, required this.onSelect});
 
   @override
   Widget build(BuildContext context) {
@@ -356,53 +307,29 @@ class _SidebarList extends StatelessWidget {
                 message: collapsed ? e.label : '',
                 child: Padding(
                   padding: collapsed
-                      ? const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 10)
-                      : const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 8),
+                      ? const EdgeInsets.symmetric(horizontal: 10, vertical: 10)
+                      : const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                   child: collapsed
-                      ? Center(
-                          child: Icon(
-                            e.icon,
-                            size: 20,
-                            color: active
-                                ? const Color(0xFFEA580C)
-                                : const Color(0xFF64748B),
-                          ),
-                        )
+                      ? Center(child: Icon(e.icon, size: 20, color: active ? const Color(0xFFEA580C) : const Color(0xFF64748B)))
                       : Row(
                           children: [
-                            Icon(
-                              e.icon,
-                              size: 18,
-                              color: active
-                                  ? const Color(0xFFEA580C)
-                                  : const Color(0xFF64748B),
-                            ),
+                            Icon(e.icon, size: 18, color: active ? const Color(0xFFEA580C) : const Color(0xFF64748B)),
                             const SizedBox(width: 10),
                             Expanded(
                               child: Column(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
                                     e.label,
                                     style: TextStyle(
                                       fontSize: 13,
-                                      fontWeight: active
-                                          ? FontWeight.w700
-                                          : FontWeight.w500,
-                                      color: active
-                                          ? const Color(0xFFEA580C)
-                                          : const Color(0xFF0F172A),
+                                      fontWeight: active ? FontWeight.w700 : FontWeight.w500,
+                                      color: active ? const Color(0xFFEA580C) : const Color(0xFF0F172A),
                                     ),
                                   ),
                                   Text(
                                     e.subtitle,
-                                    style: const TextStyle(
-                                      fontSize: 11,
-                                      color: Color(0xFF64748B),
-                                    ),
+                                    style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -465,13 +392,9 @@ class _TopBar extends StatelessWidget {
           Container(
             width: 30,
             height: 30,
-            decoration: BoxDecoration(
-              color: const Color(0xFFFFF7ED),
-              borderRadius: BorderRadius.circular(8),
-            ),
+            decoration: BoxDecoration(color: const Color(0xFFFFF7ED), borderRadius: BorderRadius.circular(8)),
             alignment: Alignment.center,
-            child: Icon(example.icon,
-                size: 16, color: const Color(0xFFEA580C)),
+            child: Icon(example.icon, size: 16, color: const Color(0xFFEA580C)),
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -481,20 +404,13 @@ class _TopBar extends StatelessWidget {
               children: [
                 Text(
                   example.label,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF0F172A),
-                  ),
+                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Color(0xFF0F172A)),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
                   example.subtitle,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    color: Color(0xFF64748B),
-                  ),
+                  style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -502,24 +418,12 @@ class _TopBar extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 8),
-          _ThemePicker(
-            themeName: themeName,
-            accent: accent,
-            onThemeChanged: onThemeChanged,
-            onAccentChanged: onAccentChanged,
-          ),
+          _ThemePicker(themeName: themeName, accent: accent, onThemeChanged: onThemeChanged, onAccentChanged: onAccentChanged),
           const SizedBox(width: 4),
           IconButton(
             onPressed: onToggleMobile,
-            icon: Icon(
-              mobilePreview
-                  ? Icons.desktop_windows_outlined
-                  : Icons.smartphone_outlined,
-              size: 18,
-            ),
-            tooltip: mobilePreview
-                ? 'Exit mobile preview'
-                : 'Preview as mobile',
+            icon: Icon(mobilePreview ? Icons.desktop_windows_outlined : Icons.smartphone_outlined, size: 18),
+            tooltip: mobilePreview ? 'Exit mobile preview' : 'Preview as mobile',
             visualDensity: VisualDensity.compact,
             color: mobilePreview ? const Color(0xFFEA580C) : null,
           ),
@@ -534,12 +438,7 @@ class _ThemePicker extends StatelessWidget {
   final Color? accent;
   final ValueChanged<DemoTheme> onThemeChanged;
   final ValueChanged<Color?> onAccentChanged;
-  const _ThemePicker({
-    required this.themeName,
-    required this.accent,
-    required this.onThemeChanged,
-    required this.onAccentChanged,
-  });
+  const _ThemePicker({required this.themeName, required this.accent, required this.onThemeChanged, required this.onAccentChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -554,10 +453,8 @@ class _ThemePicker extends StatelessWidget {
           icon: const Icon(Icons.expand_more, size: 16),
           items: const [
             DropdownMenuItem(value: DemoTheme.raw, child: Text('Raw')),
-            DropdownMenuItem(
-                value: DemoTheme.elegant, child: Text('Elegant')),
-            DropdownMenuItem(
-                value: DemoTheme.professional, child: Text('Professional')),
+            DropdownMenuItem(value: DemoTheme.elegant, child: Text('Elegant')),
+            DropdownMenuItem(value: DemoTheme.professional, child: Text('Professional')),
           ],
           onChanged: (v) {
             if (v != null) onThemeChanged(v);
@@ -568,9 +465,7 @@ class _ThemePicker extends StatelessWidget {
             color: s.color,
             label: s.label,
             selected: accent?.toARGB32() == s.color.toARGB32(),
-            onTap: () => onAccentChanged(
-              accent?.toARGB32() == s.color.toARGB32() ? null : s.color,
-            ),
+            onTap: () => onAccentChanged(accent?.toARGB32() == s.color.toARGB32() ? null : s.color),
           ),
       ],
     );
@@ -582,12 +477,7 @@ class _AccentDot extends StatelessWidget {
   final String label;
   final bool selected;
   final VoidCallback onTap;
-  const _AccentDot({
-    required this.color,
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
+  const _AccentDot({required this.color, required this.label, required this.selected, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -604,12 +494,7 @@ class _AccentDot extends StatelessWidget {
             decoration: BoxDecoration(
               color: color,
               shape: BoxShape.circle,
-              border: Border.all(
-                color: selected
-                    ? const Color(0xFF0F172A)
-                    : const Color(0xFFE2E8F0),
-                width: selected ? 2 : 1,
-              ),
+              border: Border.all(color: selected ? const Color(0xFF0F172A) : const Color(0xFFE2E8F0), width: selected ? 2 : 1),
             ),
           ),
         ),
