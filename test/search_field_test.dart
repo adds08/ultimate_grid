@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ultimate_grid/ultimate_grid.dart';
+import 'package:ultimate_grid/ultimate_grid_material.dart';
 
 void main() {
   testWidgets('UltimateSearchField forwards input to controller.setSearchQuery',

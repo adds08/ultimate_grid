@@ -117,6 +117,15 @@ class UltimateTable extends StatefulWidget {
   /// inside the body's right-frozen / bottom-frozen slices instead.
   final double scrollbarGutter;
 
+  /// Whether the table is in a loading state. When true, the header row
+  /// remains visible and a loading indicator is shown in the body area.
+  /// When false (default), the table renders normally.
+  final bool isLoading;
+
+  /// Widget shown in the body area when [isLoading] is true. Defaults to
+  /// a centered pulsing dot indicator.
+  final Widget? loadingWidget;
+
   const UltimateTable({
     super.key,
     required this.controller,
@@ -140,6 +149,8 @@ class UltimateTable extends StatefulWidget {
     this.showHorizontalScrollbar = true,
     this.scrollbarPadding = 3,
     this.scrollbarGutter = 12,
+    this.isLoading = false,
+    this.loadingWidget,
   });
 
   @override
@@ -333,10 +344,47 @@ class _UltimateTableState extends State<UltimateTable> {
     final rows = ctl.rowLayout;
     final theme = widget.theme;
 
-    if (rows.middleViewIndices.isEmpty &&
+    final hasNoRows = rows.middleViewIndices.isEmpty &&
         rows.topFrozen.isEmpty &&
-        rows.bottomFrozen.isEmpty) {
+        rows.bottomFrozen.isEmpty;
+
+    if (hasNoRows && !widget.isLoading) {
+      // When loading with headers, show headers + loading indicator.
+      // When truly empty, show empty state.
+      if (widget.headerBuilder != null) {
+        // Show header + empty state below it
+        return Column(
+          children: [
+            SizedBox(
+              height: widget.headerHeight,
+              child: _buildHeaderOnly(ctl, cols, theme),
+            ),
+            Expanded(
+              child: widget.emptyState ?? const SizedBox.shrink(),
+            ),
+          ],
+        );
+      }
       return widget.emptyState ?? const SizedBox.shrink();
+    }
+
+    if (hasNoRows && widget.isLoading) {
+      // Show headers + loading indicator
+      return Column(
+        children: [
+          if (widget.headerBuilder != null)
+            SizedBox(
+              height: widget.headerHeight,
+              child: _buildHeaderOnly(ctl, cols, theme),
+            ),
+          Expanded(
+            child: Container(
+              color: theme.background,
+              child: widget.loadingWidget ?? const _DefaultLoadingIndicator(),
+            ),
+          ),
+        ],
+      );
     }
 
     return Shortcuts(
@@ -449,6 +497,80 @@ class _UltimateTableState extends State<UltimateTable> {
       thickness: 6,
       padding: EdgeInsets.only(bottom: widget.scrollbarPadding),
       child: child,
+    );
+  }
+
+  /// Builds only the header row (for loading/empty states where the body
+  /// has no rows but we still want column headers visible).
+  Widget _buildHeaderOnly(
+    GridController ctl,
+    ColumnLayout cols,
+    GridTheme theme,
+  ) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final leftW = cols.leftFrozenWidth;
+        final rightW = cols.rightFrozenWidth;
+        final vGutter = (widget.showVerticalScrollbar &&
+                widget.scrollbarGutter > 0)
+            ? widget.scrollbarGutter
+            : 0.0;
+        return Container(
+          color: theme.headerBackground,
+          child: Row(
+            children: [
+              if (leftW > 0)
+                SizedBox(
+                  width: leftW,
+                  child: _HeaderStrip(
+                    controller: ctl,
+                    theme: theme,
+                    cols: cols.leftFrozen,
+                    builder: widget.headerBuilder!,
+                    onTap: widget.onHeaderTap,
+                    resizable: false,
+                    minWidth: widget.headerMinWidth,
+                    maxWidth: widget.headerMaxWidth,
+                  ),
+                ),
+              Expanded(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  physics: const ClampingScrollPhysics(),
+                  child: SizedBox(
+                    width: cols.middleWidth,
+                    child: _HeaderStrip(
+                      controller: ctl,
+                      theme: theme,
+                      cols: cols.middle,
+                      builder: widget.headerBuilder!,
+                      onTap: widget.onHeaderTap,
+                      resizable: widget.resizableHeader,
+                      minWidth: widget.headerMinWidth,
+                      maxWidth: widget.headerMaxWidth,
+                    ),
+                  ),
+                ),
+              ),
+              if (rightW > 0)
+                SizedBox(
+                  width: rightW,
+                  child: _HeaderStrip(
+                    controller: ctl,
+                    theme: theme,
+                    cols: cols.rightFrozen,
+                    builder: widget.headerBuilder!,
+                    onTap: widget.onHeaderTap,
+                    resizable: false,
+                    minWidth: widget.headerMinWidth,
+                    maxWidth: widget.headerMaxWidth,
+                  ),
+                ),
+              if (vGutter > 0) SizedBox(width: vGutter),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -1642,6 +1764,69 @@ class UltimateCellEditor extends StatelessWidget {
           maxLines: 1,
           onSubmitted: onSubmit,
         ),
+      ),
+    );
+  }
+}
+
+/// A simple pulsing-dot loading indicator that uses no Material/Cupertino
+/// dependencies — only `flutter/widgets.dart`.
+class _DefaultLoadingIndicator extends StatefulWidget {
+  const _DefaultLoadingIndicator();
+
+  @override
+  State<_DefaultLoadingIndicator> createState() =>
+      _DefaultLoadingIndicatorState();
+}
+
+class _DefaultLoadingIndicatorState extends State<_DefaultLoadingIndicator>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: AnimatedBuilder(
+        animation: _ctrl,
+        builder: (context, _) {
+          return Row(
+            mainAxisSize: MainAxisSize.min,
+            children: List.generate(3, (i) {
+              final delay = i * 0.2;
+              final t = ((_ctrl.value - delay) % 1.0).clamp(0.0, 1.0);
+              // Ease in-out pulse: 0→1→0
+              final opacity = (1.0 - (2.0 * t - 1.0).abs()).clamp(0.3, 1.0);
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 3),
+                child: Opacity(
+                  opacity: opacity,
+                  child: const DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: Color(0xFF94A3B8),
+                      shape: BoxShape.circle,
+                    ),
+                    child: SizedBox(width: 8, height: 8),
+                  ),
+                ),
+              );
+            }),
+          );
+        },
       ),
     );
   }

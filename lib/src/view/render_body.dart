@@ -581,16 +581,20 @@ class RenderUltimateBody extends RenderBox {
         }
 
         // Grid lines: right + bottom (Path-free, plain drawLine).
-        canvas.drawLine(
-          Offset(cellRect.right - 0.5, cellRect.top),
-          Offset(cellRect.right - 0.5, cellRect.bottom),
-          _gridLinePaint,
-        );
-        canvas.drawLine(
-          Offset(cellRect.left, cellRect.bottom - 0.5),
-          Offset(cellRect.right, cellRect.bottom - 0.5),
-          _gridLinePaint,
-        );
+        if (_theme.showVerticalGridLines) {
+          canvas.drawLine(
+            Offset(cellRect.right - 0.5, cellRect.top),
+            Offset(cellRect.right - 0.5, cellRect.bottom),
+            _gridLinePaint,
+          );
+        }
+        if (_theme.showHorizontalGridLines) {
+          canvas.drawLine(
+            Offset(cellRect.left, cellRect.bottom - 0.5),
+            Offset(cellRect.right, cellRect.bottom - 0.5),
+            _gridLinePaint,
+          );
+        }
 
         if (isFocused && !isEditing) {
           canvas.drawRect(

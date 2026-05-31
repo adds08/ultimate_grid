@@ -1,7 +1,9 @@
 /// Ultimate Table by CodeBigya — a scalable, themable 2D data-grid for Flutter.
 ///
-/// Phase 1 (current): headless model + controller. Rendering ships in
-/// subsequent phases.
+/// Core library — depends only on `flutter/widgets.dart`, no Material/Cupertino.
+///
+/// For the built-in Material column menu and search field, import
+/// `package:ultimate_grid/ultimate_grid_material.dart` separately.
 library;
 
 export 'src/model/cell_address.dart';
@@ -33,7 +35,4 @@ export 'src/cells/default_renderers.dart';
 export 'src/view/paragraph_cache.dart' show ParagraphCache;
 export 'src/view/render_body.dart' show BodyCellHit, UltimateBody;
 export 'src/view/resizable_header.dart';
-export 'src/view/column_menu.dart'
-    show showUltimateColumnMenu, showUltimateFilterDialog;
-export 'src/view/search_field.dart';
 export 'src/view/ultimate_table.dart';

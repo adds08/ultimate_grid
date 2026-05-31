@@ -24,6 +24,12 @@ class GridTheme {
   final double gridLineWidth;
   final double thickLineWidth;
 
+  /// Whether to draw horizontal grid lines between rows. Defaults to true.
+  final bool showHorizontalGridLines;
+
+  /// Whether to draw vertical grid lines between columns. Defaults to true.
+  final bool showVerticalGridLines;
+
   const GridTheme({
     required this.background,
     required this.headerBackground,
@@ -43,6 +49,8 @@ class GridTheme {
     required this.cellPadding,
     required this.gridLineWidth,
     required this.thickLineWidth,
+    this.showHorizontalGridLines = true,
+    this.showVerticalGridLines = true,
   });
 
   /// Mark 85 — the default template the user is keeping for now.
