@@ -606,7 +606,7 @@ class _UltimateTableState extends State<UltimateTable> {
         // between it and the last scrollable column. Match real-spreadsheet
         // behavior: frozen-right just sits next to the middle.
         final naturalMiddle = cols.middleWidth;
-        final availableMiddle = contentW - leftW - rightW;
+        final availableMiddle = (contentW - leftW - rightW).clamp(0.0, double.infinity);
         final middleW = naturalMiddle < availableMiddle
             ? naturalMiddle
             : availableMiddle;
@@ -621,7 +621,8 @@ class _UltimateTableState extends State<UltimateTable> {
         final inlineHBar =
             widget.showHorizontalScrollbar && widget.scrollbarGutter == 0;
 
-        final tableContent = Container(
+        final tableContent = ClipRect(
+          child: Container(
           color: theme.background,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -872,6 +873,7 @@ class _UltimateTableState extends State<UltimateTable> {
                 ),
             ],
           ),
+        ),
         );
         if (vGutter == 0 && hGutter == 0) return tableContent;
 
@@ -1171,10 +1173,12 @@ class _HeaderStripState extends State<_HeaderStrip> {
                   decoration: BoxDecoration(
                     color: theme.headerBackground,
                     border: Border(
-                      right: BorderSide(
-                        color: theme.gridLine,
-                        width: theme.gridLineWidth,
-                      ),
+                      right: theme.showVerticalGridLines
+                          ? BorderSide(
+                              color: theme.gridLine,
+                              width: theme.gridLineWidth,
+                            )
+                          : BorderSide.none,
                       bottom: BorderSide(
                         color: theme.thickLine,
                         width: theme.thickLineWidth,
@@ -1478,13 +1482,26 @@ class _BodyRegionState extends State<_BodyRegion> {
       final height = rows.middleHeights[i];
       for (final wc in widgetCols) {
         final value = widget.controller.source.valueAt(rowId, wc.colId);
+        final theme = widget.theme;
         out.add(Positioned(
           left: wc.left,
           top: top,
           width: wc.width,
           height: height,
-          child: Builder(
-            builder: (ctx) => builder(ctx, rowId, wc.colId, value),
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border(
+                right: theme.showVerticalGridLines
+                    ? BorderSide(color: theme.gridLine, width: theme.gridLineWidth)
+                    : BorderSide.none,
+                bottom: theme.showHorizontalGridLines
+                    ? BorderSide(color: theme.gridLine, width: theme.gridLineWidth)
+                    : BorderSide.none,
+              ),
+            ),
+            child: Builder(
+              builder: (ctx) => builder(ctx, rowId, wc.colId, value),
+            ),
           ),
         ));
       }
