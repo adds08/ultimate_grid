@@ -364,10 +364,7 @@ class _UltimateTableState extends State<UltimateTable> {
         rows.bottomFrozen.isEmpty;
 
     if (hasNoRows && !widget.isLoading) {
-      // When loading with headers, show headers + loading indicator.
-      // When truly empty, show empty state.
       if (widget.headerBuilder != null) {
-        // Show header + empty state below it
         return Column(
           children: [
             SizedBox(
@@ -377,6 +374,15 @@ class _UltimateTableState extends State<UltimateTable> {
             Expanded(
               child: widget.emptyState ?? const SizedBox.shrink(),
             ),
+            if (widget.footerBuilder != null)
+              Container(
+                height: widget.footerHeight,
+                decoration: BoxDecoration(
+                  color: theme.footerBackground,
+                  border: Border(top: BorderSide(color: theme.gridLine, width: theme.gridLineWidth)),
+                ),
+                child: widget.footerBuilder!(context),
+              ),
           ],
         );
       }
@@ -384,7 +390,6 @@ class _UltimateTableState extends State<UltimateTable> {
     }
 
     if (hasNoRows && widget.isLoading) {
-      // Show headers + loading indicator
       return Column(
         children: [
           if (widget.headerBuilder != null)
@@ -398,6 +403,15 @@ class _UltimateTableState extends State<UltimateTable> {
               child: widget.loadingWidget ?? const _DefaultLoadingIndicator(),
             ),
           ),
+          if (widget.footerBuilder != null)
+            Container(
+              height: widget.footerHeight,
+              decoration: BoxDecoration(
+                color: theme.footerBackground,
+                border: Border(top: BorderSide(color: theme.gridLine, width: theme.gridLineWidth)),
+              ),
+              child: widget.footerBuilder!(context),
+            ),
         ],
       );
     }
@@ -530,79 +544,60 @@ class _UltimateTableState extends State<UltimateTable> {
                 widget.scrollbarGutter > 0)
             ? widget.scrollbarGutter
             : 0.0;
-        return Column(
-          children: [
-            Container(
-              color: theme.headerBackground,
-              child: Row(
-                children: [
-                  if (leftW > 0)
-                    SizedBox(
-                      width: leftW,
-                      child: _HeaderStrip(
-                        controller: ctl,
-                        theme: theme,
-                        cols: cols.leftFrozen,
-                        builder: widget.headerBuilder!,
-                        onTap: widget.onHeaderTap,
-                        resizable: false,
-                        minWidth: widget.headerMinWidth,
-                        maxWidth: widget.headerMaxWidth,
-                      ),
-                    ),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      physics: const ClampingScrollPhysics(),
-                      child: SizedBox(
-                        width: cols.middleWidth,
-                        child: _HeaderStrip(
-                          controller: ctl,
-                          theme: theme,
-                          cols: cols.middle,
-                          builder: widget.headerBuilder!,
-                          onTap: widget.onHeaderTap,
-                          resizable: widget.resizableHeader,
-                          minWidth: widget.headerMinWidth,
-                          maxWidth: widget.headerMaxWidth,
-                        ),
-                      ),
-                    ),
+        return Container(
+          color: theme.headerBackground,
+          child: Row(
+            children: [
+              if (leftW > 0)
+                SizedBox(
+                  width: leftW,
+                  child: _HeaderStrip(
+                    controller: ctl,
+                    theme: theme,
+                    cols: cols.leftFrozen,
+                    builder: widget.headerBuilder!,
+                    onTap: widget.onHeaderTap,
+                    resizable: false,
+                    minWidth: widget.headerMinWidth,
+                    maxWidth: widget.headerMaxWidth,
                   ),
-                  if (rightW > 0)
-                    SizedBox(
-                      width: rightW,
-                      child: _HeaderStrip(
-                        controller: ctl,
-                        theme: theme,
-                        cols: cols.rightFrozen,
-                        builder: widget.headerBuilder!,
-                        onTap: widget.onHeaderTap,
-                        resizable: false,
-                        minWidth: widget.headerMinWidth,
-                        maxWidth: widget.headerMaxWidth,
-                      ),
-                    ),
-                  if (vGutter > 0) SizedBox(width: vGutter),
-                ],
-              ),
-            ),
-            const Spacer(),
-            if (widget.footerBuilder != null)
-              Container(
-                height: widget.footerHeight,
-                decoration: BoxDecoration(
-                  color: theme.footerBackground,
-                  border: Border(
-                    top: BorderSide(
-                      color: theme.gridLine,
-                      width: theme.gridLineWidth,
+                ),
+              Expanded(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  physics: const ClampingScrollPhysics(),
+                  child: SizedBox(
+                    width: cols.middleWidth,
+                    child: _HeaderStrip(
+                      controller: ctl,
+                      theme: theme,
+                      cols: cols.middle,
+                      builder: widget.headerBuilder!,
+                      onTap: widget.onHeaderTap,
+                      resizable: widget.resizableHeader,
+                      minWidth: widget.headerMinWidth,
+                      maxWidth: widget.headerMaxWidth,
                     ),
                   ),
                 ),
-                child: widget.footerBuilder!(context),
               ),
-          ],
+              if (rightW > 0)
+                SizedBox(
+                  width: rightW,
+                  child: _HeaderStrip(
+                    controller: ctl,
+                    theme: theme,
+                    cols: cols.rightFrozen,
+                    builder: widget.headerBuilder!,
+                    onTap: widget.onHeaderTap,
+                    resizable: false,
+                    minWidth: widget.headerMinWidth,
+                    maxWidth: widget.headerMaxWidth,
+                  ),
+                ),
+              if (vGutter > 0) SizedBox(width: vGutter),
+            ],
+          ),
         );
       },
     );
@@ -634,7 +629,7 @@ class _UltimateTableState extends State<UltimateTable> {
         // gutters and footer are subtracted.
         final footerH = widget.footerBuilder != null ? widget.footerHeight : 0.0;
         final contentW = viewportWidth - vGutter;
-        final contentH = viewportHeight - hGutter - footerH;
+        final contentH = (viewportHeight - hGutter - footerH).clamp(0.0, double.infinity);
         // Clamp the middle band to its natural width when the table is
         // narrower than the viewport — otherwise the right-frozen column
         // sits flush against the viewport edge with a big empty gap
@@ -649,7 +644,7 @@ class _UltimateTableState extends State<UltimateTable> {
             widget.headerBuilder != null ? widget.headerHeight : 0.0;
         final topH = rows.topFrozenHeight;
         final bottomH = rows.bottomFrozenHeight;
-        final middleH = contentH - headerH - topH - bottomH;
+        final middleH = (contentH - headerH - topH - bottomH).clamp(0.0, double.infinity);
         // Should the in-body scrollbars still show? Only if no gutter.
         final inlineVBar =
             widget.showVerticalScrollbar && widget.scrollbarGutter == 0;
