@@ -1,60 +1,17 @@
-import 'package:flutter/material.dart';
+import 'dart:async';
+
 import 'package:flutter/painting.dart' as painting;
+import 'package:flutter/widgets.dart';
 
 import '../controller/grid_controller.dart';
-import '../filter_sort/filters.dart';
 import '../filter_sort/view_pipeline.dart';
 import '../model/cell_address.dart';
 import '../model/column_spec.dart';
 import '../model/freeze.dart';
 import '../theme/grid_theme.dart';
 
-/// Per-column popup menu. Sort asc / desc / off, pin left / right / none,
-/// hide, resize-to-fit, filter (text, number range, or multi-value depending
-/// on the column's [CellKind]). Designed to be opened from the header's
-/// long-press / menu-button callback.
-///
-/// Open with `showUltimateColumnMenu(context: …, controller: …, colId: …)`.
-Future<void> showUltimateColumnMenu({
-  required BuildContext context,
-  required GridController controller,
-  required ColId colId,
-  RelativeRect? position,
-  GridTheme theme = GridTheme.mark85,
-}) async {
-  final box = context.findRenderObject() as RenderBox?;
-  final overlay =
-      Overlay.of(context).context.findRenderObject() as RenderBox?;
-  RelativeRect pos;
-  if (position != null) {
-    pos = position;
-  } else if (box != null && overlay != null) {
-    // Describe the header cell as an anchor rect in overlay coordinates.
-    // `showMenu` opens the menu at the bottom-left of this rect when
-    // there's room below — same shape that a normal `PopupMenuButton`
-    // computes internally — so the animation lands smoothly under the
-    // tapped cell.
-    final cellTopLeft = box.localToGlobal(Offset.zero, ancestor: overlay);
-    final cellBottomRight = cellTopLeft + Offset(box.size.width, box.size.height);
-    pos = RelativeRect.fromRect(
-      Rect.fromPoints(cellTopLeft, cellBottomRight),
-      Offset.zero & overlay.size,
-    );
-  } else {
-    pos = const RelativeRect.fromLTRB(0, 0, 0, 0);
-  }
-
-  final action = await showMenu<_ColumnMenuAction>(
-    context: context,
-    position: pos,
-    items: _buildItems(controller, colId),
-  );
-  if (action == null) return;
-  if (!context.mounted) return;
-  await _applyAction(context, controller, colId, action, theme);
-}
-
-enum _ColumnMenuAction {
+/// Column menu actions that can be performed on a column.
+enum ColumnMenuAction {
   sortAsc,
   sortDesc,
   sortOff,
@@ -67,106 +24,95 @@ enum _ColumnMenuAction {
   clearFilter,
 }
 
-/// One menu row. Uses Material defaults for height + interactive area so
-/// the popup feels like a stock `PopupMenuButton`. The leading icon +
-/// trailing check are the only ornamentation.
-PopupMenuItem<_ColumnMenuAction> _row(
-  _ColumnMenuAction value,
-  IconData icon,
-  String label, {
-  bool active = false,
-  Color? trailingColor,
-}) {
-  return PopupMenuItem<_ColumnMenuAction>(
-    value: value,
-    child: Row(
-      children: [
-        Icon(
-          icon,
-          size: 18,
-          color: active ? const Color(0xFFEA580C) : const Color(0xFF475569),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: active ? FontWeight.w600 : FontWeight.w400,
-              color: trailingColor ??
-                  (active
-                      ? const Color(0xFFEA580C)
-                      : const Color(0xFF0F172A)),
-            ),
-          ),
-        ),
-        if (active)
-          const Icon(Icons.check, size: 16, color: Color(0xFFEA580C)),
-      ],
-    ),
-  );
+/// State snapshot of a column, passed to menu builders so they can
+/// render active indicators (sort direction, filter presence, pin state).
+class ColumnMenuState {
+  final ColId colId;
+  final String header;
+  final CellKind kind;
+  final SortDirection? currentSortDirection;
+  final bool hasFilter;
+  final FrozenSide? frozenSide;
+
+  const ColumnMenuState({
+    required this.colId,
+    required this.header,
+    required this.kind,
+    this.currentSortDirection,
+    this.hasFilter = false,
+    this.frozenSide,
+  });
 }
 
-List<PopupMenuEntry<_ColumnMenuAction>> _buildItems(
-  GridController controller,
-  ColId colId,
-) {
-  final sortKey = controller.sortKeys.firstWhere(
-    (k) => k.col == colId,
-    orElse: () => const SortKey('', SortDirection.ascending),
-  );
+/// Signature for a custom column menu builder.
+///
+/// Receives the build context, controller, column state, and a callback
+/// to apply an action. The builder is responsible for showing a popup/menu
+/// and calling [onAction] with the user's selection.
+typedef ColumnMenuBuilder = Future<void> Function({
+  required BuildContext context,
+  required GridController controller,
+  required ColumnMenuState columnState,
+  required void Function(ColumnMenuAction action) onAction,
+});
+
+/// Signature for a custom filter dialog builder.
+typedef FilterDialogBuilder = Future<void> Function({
+  required BuildContext context,
+  required GridController controller,
+  required ColId colId,
+  required CellKind kind,
+  required String header,
+});
+
+/// Extract the current state of a column for menu display.
+ColumnMenuState getColumnMenuState(GridController controller, ColId colId) {
+  final spec = controller.schema.column(colId);
+  final sortKey = controller.sortKeys
+      .where((k) => k.col == colId)
+      .firstOrNull;
   final hasFilter = controller.filters.containsKey(colId);
   final frozen = controller.freezeOf(colId);
-  return <PopupMenuEntry<_ColumnMenuAction>>[
-    _row(_ColumnMenuAction.sortAsc, Icons.arrow_upward, 'Sort ascending',
-        active: sortKey.col == colId &&
-            sortKey.direction == SortDirection.ascending),
-    _row(_ColumnMenuAction.sortDesc, Icons.arrow_downward, 'Sort descending',
-        active: sortKey.col == colId &&
-            sortKey.direction == SortDirection.descending),
-    _row(_ColumnMenuAction.sortOff, Icons.clear, 'Clear sort'),
-    const PopupMenuDivider(),
-    _row(_ColumnMenuAction.pinLeft, Icons.push_pin_outlined, 'Pin to left',
-        active: frozen == FrozenSide.start),
-    _row(_ColumnMenuAction.pinRight, Icons.push_pin, 'Pin to right',
-        active: frozen == FrozenSide.end),
-    _row(_ColumnMenuAction.pinNone, Icons.location_off_outlined, 'Unpin'),
-    const PopupMenuDivider(),
-    _row(_ColumnMenuAction.hide, Icons.visibility_off_outlined, 'Hide column'),
-    _row(_ColumnMenuAction.fit, Icons.straighten, 'Resize to fit'),
-    const PopupMenuDivider(),
-    _row(_ColumnMenuAction.filter, Icons.filter_alt_outlined, 'Filter…',
-        active: hasFilter),
-    if (hasFilter)
-      _row(_ColumnMenuAction.clearFilter, Icons.filter_alt_off_outlined,
-          'Clear filter',
-          trailingColor: const Color(0xFFB91C1C)),
-  ];
+
+  return ColumnMenuState(
+    colId: colId,
+    header: spec?.header ?? colId,
+    kind: spec?.kind ?? CellKind.text,
+    currentSortDirection: sortKey?.col == colId ? sortKey?.direction : null,
+    hasFilter: hasFilter,
+    frozenSide: frozen,
+  );
 }
 
-Future<void> _applyAction(
+/// Apply a [ColumnMenuAction] to the controller.
+///
+/// This is framework-agnostic — only touches the controller, no UI.
+/// Call from your custom menu builder's `onAction` callback, or use
+/// directly after `showUltimateColumnMenu`.
+Future<void> applyColumnMenuAction(
   BuildContext context,
   GridController controller,
   ColId colId,
-  _ColumnMenuAction action,
-  GridTheme theme,
-) async {
+  ColumnMenuAction action, {
+  GridTheme theme = GridTheme.mark85,
+  FilterDialogBuilder? filterDialogBuilder,
+}) async {
   switch (action) {
-    case _ColumnMenuAction.sortAsc:
+    case ColumnMenuAction.sortAsc:
       controller.setSortKeys([SortKey(colId, SortDirection.ascending)]);
-    case _ColumnMenuAction.sortDesc:
+    case ColumnMenuAction.sortDesc:
       controller.setSortKeys([SortKey(colId, SortDirection.descending)]);
-    case _ColumnMenuAction.sortOff:
+    case ColumnMenuAction.sortOff:
       controller.setSortKeys(const []);
-    case _ColumnMenuAction.pinLeft:
+    case ColumnMenuAction.pinLeft:
       controller.setColumnFreeze(colId, FrozenSide.start);
-    case _ColumnMenuAction.pinRight:
+    case ColumnMenuAction.pinRight:
       controller.setColumnFreeze(colId, FrozenSide.end);
-    case _ColumnMenuAction.pinNone:
+    case ColumnMenuAction.pinNone:
       controller.setColumnFreeze(colId, null);
-    case _ColumnMenuAction.hide:
+    case ColumnMenuAction.hide:
       controller.hideColumn(colId);
-    case _ColumnMenuAction.fit:
+    case ColumnMenuAction.fit:
       final spec = controller.schema.column(colId);
       final style = spec?.kind == CellKind.number
           ? theme.bodyNumericStyle
@@ -184,145 +130,288 @@ Future<void> _applyAction(
           return w;
         },
       );
-    case _ColumnMenuAction.filter:
+    case ColumnMenuAction.filter:
       if (!context.mounted) return;
-      await showUltimateFilterDialog(
-        context: context,
-        controller: controller,
-        colId: colId,
-      );
-    case _ColumnMenuAction.clearFilter:
+      if (filterDialogBuilder != null) {
+        final spec = controller.schema.column(colId);
+        await filterDialogBuilder(
+          context: context,
+          controller: controller,
+          colId: colId,
+          kind: spec?.kind ?? CellKind.text,
+          header: spec?.header ?? colId,
+        );
+      }
+    case ColumnMenuAction.clearFilter:
       controller.setFilter(colId, null);
   }
 }
 
-/// Dialog with a column-kind-appropriate filter input. Submitting writes a
-/// [FilterPredicate] back via `controller.setFilter`.
-Future<void> showUltimateFilterDialog({
+/// Framework-agnostic entry point for column menus.
+///
+/// If [menuBuilder] is provided, delegates to it. Otherwise falls back
+/// to a minimal painted overlay menu with sort/pin/filter actions.
+Future<void> showUltimateColumnMenu({
   required BuildContext context,
   required GridController controller,
   required ColId colId,
+  GridTheme theme = GridTheme.mark85,
+  ColumnMenuBuilder? menuBuilder,
+  FilterDialogBuilder? filterDialogBuilder,
 }) async {
-  final spec = controller.schema.column(colId);
-  if (spec == null) return;
-  await showDialog<void>(
-    context: context,
-    builder: (ctx) {
-      return AlertDialog(
-        title: Text('Filter ${spec.header}'),
-        content: SizedBox(
-          width: 320,
-          child: _FilterInputForKind(
-            controller: controller,
-            colId: colId,
-            kind: spec.kind,
-          ),
-        ),
-      );
-    },
+  final state = getColumnMenuState(controller, colId);
+
+  if (menuBuilder != null) {
+    await menuBuilder(
+      context: context,
+      controller: controller,
+      columnState: state,
+      onAction: (action) => applyColumnMenuAction(
+        context,
+        controller,
+        colId,
+        action,
+        theme: theme,
+        filterDialogBuilder: filterDialogBuilder,
+      ),
+    );
+    return;
+  }
+
+  // Default: painted overlay menu (no Material dependency)
+  if (!context.mounted) return;
+  final result = await _showPaintedMenu(context, state);
+  if (result == null || !context.mounted) return;
+  await applyColumnMenuAction(
+    context,
+    controller,
+    colId,
+    result,
+    theme: theme,
+    filterDialogBuilder: filterDialogBuilder,
   );
 }
 
-class _FilterInputForKind extends StatefulWidget {
-  final GridController controller;
-  final ColId colId;
-  final CellKind kind;
-  const _FilterInputForKind({
-    required this.controller,
-    required this.colId,
-    required this.kind,
+// ── Default painted overlay menu (no Material) ───────────────────────────────
+
+Future<ColumnMenuAction?> _showPaintedMenu(
+  BuildContext context,
+  ColumnMenuState state,
+) async {
+  final box = context.findRenderObject() as RenderBox?;
+  if (box == null) return null;
+
+  final overlay = Overlay.of(context);
+  final overlayBox = overlay.context.findRenderObject() as RenderBox;
+  final position = box.localToGlobal(
+    Offset(0, box.size.height),
+    ancestor: overlayBox,
+  );
+
+  final completer = _MenuCompleter<ColumnMenuAction>();
+
+  final entry = OverlayEntry(
+    builder: (ctx) => _PaintedColumnMenu(
+      position: position,
+      state: state,
+      onSelect: (action) {
+        completer.complete(action);
+      },
+      onDismiss: () {
+        completer.complete(null);
+      },
+    ),
+  );
+
+  overlay.insert(entry);
+  final result = await completer.future;
+  entry.remove();
+  return result;
+}
+
+class _MenuCompleter<T> {
+  final _completer = Completer<T?>();
+
+  Future<T?> get future => _completer.future;
+
+  void complete(T? value) {
+    if (!_completer.isCompleted) {
+      _completer.complete(value);
+    }
+  }
+}
+
+class _PaintedColumnMenu extends StatelessWidget {
+  final Offset position;
+  final ColumnMenuState state;
+  final ValueChanged<ColumnMenuAction> onSelect;
+  final VoidCallback onDismiss;
+
+  const _PaintedColumnMenu({
+    required this.position,
+    required this.state,
+    required this.onSelect,
+    required this.onDismiss,
   });
 
   @override
-  State<_FilterInputForKind> createState() => _FilterInputForKindState();
+  Widget build(BuildContext context) {
+    final items = <_MenuItem>[
+      _MenuItem(
+        ColumnMenuAction.sortAsc,
+        '↑  Sort ascending',
+        state.currentSortDirection == SortDirection.ascending,
+      ),
+      _MenuItem(
+        ColumnMenuAction.sortDesc,
+        '↓  Sort descending',
+        state.currentSortDirection == SortDirection.descending,
+      ),
+      _MenuItem(ColumnMenuAction.sortOff, '✕  Clear sort', false),
+      _MenuItem.divider(),
+      _MenuItem(
+        ColumnMenuAction.pinLeft,
+        '◧  Pin to left',
+        state.frozenSide == FrozenSide.start,
+      ),
+      _MenuItem(
+        ColumnMenuAction.pinRight,
+        '◨  Pin to right',
+        state.frozenSide == FrozenSide.end,
+      ),
+      _MenuItem(ColumnMenuAction.pinNone, '◻  Unpin', false),
+      _MenuItem.divider(),
+      _MenuItem(ColumnMenuAction.hide, '◌  Hide column', false),
+      _MenuItem(ColumnMenuAction.fit, '⇔  Resize to fit', false),
+      _MenuItem.divider(),
+      _MenuItem(
+        ColumnMenuAction.filter,
+        '▽  Filter…',
+        state.hasFilter,
+      ),
+      if (state.hasFilter)
+        _MenuItem(ColumnMenuAction.clearFilter, '△  Clear filter', false,
+            isDestructive: true),
+    ];
+
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onTap: onDismiss,
+      child: Stack(
+        children: [
+          Positioned(
+            left: position.dx,
+            top: position.dy,
+            child: _PaintedMenuPanel(
+              items: items,
+              onSelect: onSelect,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
-class _FilterInputForKindState extends State<_FilterInputForKind> {
-  final _textCtrl = TextEditingController();
-  final _minCtrl = TextEditingController();
-  final _maxCtrl = TextEditingController();
+class _MenuItem {
+  final ColumnMenuAction? action;
+  final String label;
+  final bool active;
+  final bool isDivider;
+  final bool isDestructive;
+
+  const _MenuItem(this.action, this.label, this.active,
+      {this.isDestructive = false})
+      : isDivider = false;
+
+  const _MenuItem.divider()
+      : action = null,
+        label = '',
+        active = false,
+        isDivider = true,
+        isDestructive = false;
+}
+
+class _PaintedMenuPanel extends StatefulWidget {
+  final List<_MenuItem> items;
+  final ValueChanged<ColumnMenuAction> onSelect;
+
+  const _PaintedMenuPanel({required this.items, required this.onSelect});
 
   @override
-  void dispose() {
-    _textCtrl.dispose();
-    _minCtrl.dispose();
-    _maxCtrl.dispose();
-    super.dispose();
-  }
+  State<_PaintedMenuPanel> createState() => _PaintedMenuPanelState();
+}
+
+class _PaintedMenuPanelState extends State<_PaintedMenuPanel> {
+  int _hoveredIndex = -1;
 
   @override
   Widget build(BuildContext context) {
-    final kind = widget.kind;
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        if (kind == CellKind.number) ...[
-          TextField(
-            controller: _minCtrl,
-            decoration: const InputDecoration(labelText: 'Min'),
-            keyboardType: const TextInputType.numberWithOptions(
-              decimal: true,
-              signed: true,
-            ),
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFFFFF),
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x33000000),
+            blurRadius: 12,
+            offset: Offset(0, 4),
           ),
-          const SizedBox(height: 8),
-          TextField(
-            controller: _maxCtrl,
-            decoration: const InputDecoration(labelText: 'Max'),
-            keyboardType: const TextInputType.numberWithOptions(
-              decimal: true,
-              signed: true,
-            ),
+        ],
+        border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: IntrinsicWidth(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              for (var i = 0; i < widget.items.length; i++)
+                if (widget.items[i].isDivider)
+                  Container(
+                    height: 1,
+                    color: const Color(0xFFE2E8F0),
+                  )
+                else
+                  MouseRegion(
+                    onEnter: (_) => setState(() => _hoveredIndex = i),
+                    onExit: (_) => setState(() => _hoveredIndex = -1),
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () {
+                        final action = widget.items[i].action;
+                        if (action != null) widget.onSelect(action);
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                        color: _hoveredIndex == i
+                            ? const Color(0xFFF1F5F9)
+                            : null,
+                        child: Text(
+                          widget.items[i].label,
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: widget.items[i].active
+                                ? FontWeight.w600
+                                : FontWeight.w400,
+                            color: widget.items[i].isDestructive
+                                ? const Color(0xFFB91C1C)
+                                : widget.items[i].active
+                                    ? const Color(0xFFEA580C)
+                                    : const Color(0xFF0F172A),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+            ],
           ),
-        ] else
-          TextField(
-            controller: _textCtrl,
-            decoration: const InputDecoration(labelText: 'Contains'),
-            autofocus: true,
-          ),
-        const SizedBox(height: 12),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            TextButton(
-              onPressed: () {
-                widget.controller.setFilter(widget.colId, null);
-                Navigator.of(context).pop();
-              },
-              child: const Text('Clear'),
-            ),
-            const SizedBox(width: 8),
-            FilledButton(
-              onPressed: () {
-                _apply();
-                Navigator.of(context).pop();
-              },
-              child: const Text('Apply'),
-            ),
-          ],
         ),
-      ],
+      ),
     );
-  }
-
-  void _apply() {
-    if (widget.kind == CellKind.number) {
-      final min = double.tryParse(_minCtrl.text);
-      final max = double.tryParse(_maxCtrl.text);
-      if (min == null && max == null) {
-        widget.controller.setFilter(widget.colId, null);
-      } else {
-        widget.controller
-            .setFilter(widget.colId, Filters.numberRange(min: min, max: max));
-      }
-      return;
-    }
-    final needle = _textCtrl.text.trim();
-    if (needle.isEmpty) {
-      widget.controller.setFilter(widget.colId, null);
-    } else {
-      widget.controller.setFilter(widget.colId, Filters.textContains(needle));
-    }
   }
 }

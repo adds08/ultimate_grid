@@ -1,14 +1,12 @@
-/// Material-dependent utilities for ultimate_grid.
+/// Deprecated — all exports are now available from the core
+/// `package:ultimate_grid/ultimate_grid.dart` import.
 ///
-/// Provides the built-in column menu (`showUltimateColumnMenu`), filter dialog
-/// (`showUltimateFilterDialog`), and search field (`UltimateSearchField`) —
-/// all of which depend on `flutter/material.dart`.
-///
-/// Apps using non-Material design systems (e.g., shadcn_flutter) can skip this
-/// import and build their own column menu / filter UI using the core
-/// `package:ultimate_grid/ultimate_grid.dart` API.
+/// This file is kept for backwards compatibility only. It re-exports the
+/// same symbols from the core library.
 library;
 
 export 'src/view/column_menu.dart'
-    show showUltimateColumnMenu, showUltimateFilterDialog;
+    show showUltimateColumnMenu, ColumnMenuAction, ColumnMenuState,
+    ColumnMenuBuilder, FilterDialogBuilder, getColumnMenuState,
+    applyColumnMenuAction;
 export 'src/view/search_field.dart';

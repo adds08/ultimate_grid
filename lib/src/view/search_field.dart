@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 import '../controller/grid_controller.dart';
 import '../filter_sort/filters.dart';
@@ -6,6 +6,9 @@ import '../filter_sort/filters.dart';
 /// Pre-built global search input. Drives `controller.setSearchQuery` and
 /// — if [showFilterToggle] is true — exposes a toggle between
 /// `SearchMode.highlight` (default) and `SearchMode.filter` (drop non-matches).
+///
+/// Framework-agnostic: uses only `flutter/widgets.dart`. Style via the
+/// constructor parameters or wrap in your own UI framework's input widget.
 class UltimateSearchField extends StatefulWidget {
   final GridController controller;
   final String hintText;
@@ -52,21 +55,29 @@ class _UltimateSearchFieldState extends State<UltimateSearchField> {
         SizedBox(
           width: widget.width,
           height: 32,
-          child: TextField(
-            controller: _ctrl,
-            style: const TextStyle(fontSize: 13),
-            decoration: InputDecoration(
-              prefixIcon: const Icon(Icons.search, size: 16),
-              isDense: true,
-              contentPadding: widget.padding,
-              hintText: widget.hintText,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(6),
-                borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(6),
-                borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              border: Border.all(color: const Color(0xFFE2E8F0)),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Padding(
+              padding: widget.padding,
+              child: Row(
+                children: [
+                  const Text('🔍',
+                      style: TextStyle(fontSize: 13, color: Color(0xFF94A3B8))),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: EditableText(
+                      controller: _ctrl,
+                      focusNode: FocusNode(),
+                      style: const TextStyle(
+                          fontSize: 13, color: Color(0xFF0F172A)),
+                      cursorColor: const Color(0xFF7C3AED),
+                      backgroundCursorColor: const Color(0xFFE2E8F0),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -81,8 +92,8 @@ class _UltimateSearchFieldState extends State<UltimateSearchField> {
 
   Widget _buildModeToggle() {
     final mode = widget.controller.searchMode;
-    return TextButton.icon(
-      onPressed: () {
+    return GestureDetector(
+      onTap: () {
         widget.controller.setSearchMode(
           mode == SearchMode.highlight
               ? SearchMode.filter
@@ -90,20 +101,16 @@ class _UltimateSearchFieldState extends State<UltimateSearchField> {
         );
         setState(() {});
       },
-      icon: Icon(
-        mode == SearchMode.filter
-            ? Icons.filter_alt
-            : Icons.lightbulb_outline,
-        size: 14,
-      ),
-      label: Text(
-        mode == SearchMode.filter ? 'Filter' : 'Highlight',
-        style: const TextStyle(fontSize: 12),
-      ),
-      style: TextButton.styleFrom(
-        padding: const EdgeInsets.symmetric(horizontal: 8),
-        minimumSize: const Size(0, 32),
-        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        decoration: BoxDecoration(
+          border: Border.all(color: const Color(0xFFE2E8F0)),
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Text(
+          mode == SearchMode.filter ? '▽ Filter' : '◈ Highlight',
+          style: const TextStyle(fontSize: 12, color: Color(0xFF475569)),
+        ),
       ),
     );
   }

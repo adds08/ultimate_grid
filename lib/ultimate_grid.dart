@@ -2,8 +2,9 @@
 ///
 /// Core library — depends only on `flutter/widgets.dart`, no Material/Cupertino.
 ///
-/// For the built-in Material column menu and search field, import
-/// `package:ultimate_grid/ultimate_grid_material.dart` separately.
+/// Column menu & search field are included and framework-agnostic. Use the
+/// `menuBuilder` / `filterDialogBuilder` callbacks on `showUltimateColumnMenu`
+/// to plug in your own UI framework's popup/dialog (shadcn, Material, etc.).
 library;
 
 export 'src/model/cell_address.dart';
@@ -36,3 +37,5 @@ export 'src/view/paragraph_cache.dart' show ParagraphCache;
 export 'src/view/render_body.dart' show BodyCellHit, UltimateBody;
 export 'src/view/resizable_header.dart';
 export 'src/view/ultimate_table.dart';
+export 'src/view/column_menu.dart';
+export 'src/view/search_field.dart';
