@@ -126,6 +126,19 @@ class UltimateTable extends StatefulWidget {
   /// a centered pulsing dot indicator.
   final Widget? loadingWidget;
 
+  /// Optional footer toolbar rendered below the table body (after any
+  /// bottom-frozen rows). Use this for pagination controls, row counts,
+  /// action buttons, or any toolbar content that should appear anchored
+  /// at the bottom of the table.
+  ///
+  /// The footer spans the full table width and is styled with
+  /// [GridTheme.footerBackground]. It does NOT scroll with the body.
+  final Widget Function(BuildContext context)? footerBuilder;
+
+  /// Height of the footer toolbar. Only used when [footerBuilder] is set.
+  /// Defaults to 44.
+  final double footerHeight;
+
   const UltimateTable({
     super.key,
     required this.controller,
@@ -151,6 +164,8 @@ class UltimateTable extends StatefulWidget {
     this.scrollbarGutter = 12,
     this.isLoading = false,
     this.loadingWidget,
+    this.footerBuilder,
+    this.footerHeight = 44,
   });
 
   @override
@@ -515,60 +530,79 @@ class _UltimateTableState extends State<UltimateTable> {
                 widget.scrollbarGutter > 0)
             ? widget.scrollbarGutter
             : 0.0;
-        return Container(
-          color: theme.headerBackground,
-          child: Row(
-            children: [
-              if (leftW > 0)
-                SizedBox(
-                  width: leftW,
-                  child: _HeaderStrip(
-                    controller: ctl,
-                    theme: theme,
-                    cols: cols.leftFrozen,
-                    builder: widget.headerBuilder!,
-                    onTap: widget.onHeaderTap,
-                    resizable: false,
-                    minWidth: widget.headerMinWidth,
-                    maxWidth: widget.headerMaxWidth,
+        return Column(
+          children: [
+            Container(
+              color: theme.headerBackground,
+              child: Row(
+                children: [
+                  if (leftW > 0)
+                    SizedBox(
+                      width: leftW,
+                      child: _HeaderStrip(
+                        controller: ctl,
+                        theme: theme,
+                        cols: cols.leftFrozen,
+                        builder: widget.headerBuilder!,
+                        onTap: widget.onHeaderTap,
+                        resizable: false,
+                        minWidth: widget.headerMinWidth,
+                        maxWidth: widget.headerMaxWidth,
+                      ),
+                    ),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      physics: const ClampingScrollPhysics(),
+                      child: SizedBox(
+                        width: cols.middleWidth,
+                        child: _HeaderStrip(
+                          controller: ctl,
+                          theme: theme,
+                          cols: cols.middle,
+                          builder: widget.headerBuilder!,
+                          onTap: widget.onHeaderTap,
+                          resizable: widget.resizableHeader,
+                          minWidth: widget.headerMinWidth,
+                          maxWidth: widget.headerMaxWidth,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-              Expanded(
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  physics: const ClampingScrollPhysics(),
-                  child: SizedBox(
-                    width: cols.middleWidth,
-                    child: _HeaderStrip(
-                      controller: ctl,
-                      theme: theme,
-                      cols: cols.middle,
-                      builder: widget.headerBuilder!,
-                      onTap: widget.onHeaderTap,
-                      resizable: widget.resizableHeader,
-                      minWidth: widget.headerMinWidth,
-                      maxWidth: widget.headerMaxWidth,
+                  if (rightW > 0)
+                    SizedBox(
+                      width: rightW,
+                      child: _HeaderStrip(
+                        controller: ctl,
+                        theme: theme,
+                        cols: cols.rightFrozen,
+                        builder: widget.headerBuilder!,
+                        onTap: widget.onHeaderTap,
+                        resizable: false,
+                        minWidth: widget.headerMinWidth,
+                        maxWidth: widget.headerMaxWidth,
+                      ),
+                    ),
+                  if (vGutter > 0) SizedBox(width: vGutter),
+                ],
+              ),
+            ),
+            const Spacer(),
+            if (widget.footerBuilder != null)
+              Container(
+                height: widget.footerHeight,
+                decoration: BoxDecoration(
+                  color: theme.footerBackground,
+                  border: Border(
+                    top: BorderSide(
+                      color: theme.gridLine,
+                      width: theme.gridLineWidth,
                     ),
                   ),
                 ),
+                child: widget.footerBuilder!(context),
               ),
-              if (rightW > 0)
-                SizedBox(
-                  width: rightW,
-                  child: _HeaderStrip(
-                    controller: ctl,
-                    theme: theme,
-                    cols: cols.rightFrozen,
-                    builder: widget.headerBuilder!,
-                    onTap: widget.onHeaderTap,
-                    resizable: false,
-                    minWidth: widget.headerMinWidth,
-                    maxWidth: widget.headerMaxWidth,
-                  ),
-                ),
-              if (vGutter > 0) SizedBox(width: vGutter),
-            ],
-          ),
+          ],
         );
       },
     );
@@ -597,9 +631,10 @@ class _UltimateTableState extends State<UltimateTable> {
             ? widget.scrollbarGutter
             : 0.0;
         // Width / height available for the actual table content after the
-        // gutters are subtracted.
+        // gutters and footer are subtracted.
+        final footerH = widget.footerBuilder != null ? widget.footerHeight : 0.0;
         final contentW = viewportWidth - vGutter;
-        final contentH = viewportHeight - hGutter;
+        final contentH = viewportHeight - hGutter - footerH;
         // Clamp the middle band to its natural width when the table is
         // narrower than the viewport — otherwise the right-frozen column
         // sits flush against the viewport edge with a big empty gap
@@ -871,6 +906,21 @@ class _UltimateTableState extends State<UltimateTable> {
                     ),
                   ),
                 ),
+            // ── Footer toolbar ──
+            if (widget.footerBuilder != null)
+              Container(
+                height: widget.footerHeight,
+                decoration: BoxDecoration(
+                  color: theme.footerBackground,
+                  border: Border(
+                    top: BorderSide(
+                      color: theme.gridLine,
+                      width: theme.gridLineWidth,
+                    ),
+                  ),
+                ),
+                child: widget.footerBuilder!(context),
+              ),
             ],
           ),
         ),
