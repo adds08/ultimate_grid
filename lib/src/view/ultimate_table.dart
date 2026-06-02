@@ -629,7 +629,7 @@ class _UltimateTableState extends State<UltimateTable> {
         // gutters and footer are subtracted.
         final footerH = widget.footerBuilder != null ? widget.footerHeight : 0.0;
         final contentW = viewportWidth - vGutter;
-        final contentH = (viewportHeight - hGutter - footerH).clamp(0.0, double.infinity);
+        final contentH = (viewportHeight - hGutter).clamp(0.0, double.infinity);
         // Clamp the middle band to its natural width when the table is
         // narrower than the viewport — otherwise the right-frozen column
         // sits flush against the viewport edge with a big empty gap
@@ -644,7 +644,7 @@ class _UltimateTableState extends State<UltimateTable> {
             widget.headerBuilder != null ? widget.headerHeight : 0.0;
         final topH = rows.topFrozenHeight;
         final bottomH = rows.bottomFrozenHeight;
-        final middleH = (contentH - headerH - topH - bottomH).clamp(0.0, double.infinity);
+        final middleH = (contentH - headerH - topH - bottomH - footerH).clamp(0.0, double.infinity);
         // Should the in-body scrollbars still show? Only if no gutter.
         final inlineVBar =
             widget.showVerticalScrollbar && widget.scrollbarGutter == 0;
