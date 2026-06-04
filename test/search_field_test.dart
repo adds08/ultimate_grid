@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ultimate_grid/ultimate_grid.dart';
-import 'package:ultimate_grid/ultimate_grid_material.dart';
 
 void main() {
-  testWidgets('UltimateSearchField forwards input to controller.setSearchQuery',
-      (tester) async {
+  testWidgets('UltimateSearchField forwards input to controller.setSearchQuery', (tester) async {
     final schema = GridSchema(
       columns: const [ColumnSpec(id: 'a', header: 'A')],
       rows: const [RowSpec(id: 'r1')],
@@ -16,12 +14,7 @@ void main() {
 
     await tester.pumpWidget(
       MaterialApp(
-        home: Scaffold(
-          body: UltimateSearchField(
-            controller: controller,
-            showFilterToggle: false,
-          ),
-        ),
+        home: Scaffold(body: UltimateSearchField(controller: controller, showFilterToggle: false)),
       ),
     );
     await tester.pumpAndSettle();
@@ -31,8 +24,7 @@ void main() {
     expect(controller.searchQuery, 'app');
   });
 
-  testWidgets('UltimateSearchField mode toggle flips SearchMode',
-      (tester) async {
+  testWidgets('UltimateSearchField mode toggle flips SearchMode', (tester) async {
     final schema = GridSchema(
       columns: const [ColumnSpec(id: 'a', header: 'A')],
       rows: const [RowSpec(id: 'r1')],
@@ -42,9 +34,7 @@ void main() {
 
     await tester.pumpWidget(
       MaterialApp(
-        home: Scaffold(
-          body: UltimateSearchField(controller: controller),
-        ),
+        home: Scaffold(body: UltimateSearchField(controller: controller)),
       ),
     );
     await tester.pumpAndSettle();

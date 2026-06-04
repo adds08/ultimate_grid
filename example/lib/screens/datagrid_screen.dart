@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ultimate_grid/ultimate_grid.dart';
-import 'package:ultimate_grid/ultimate_grid_material.dart';
 
 import '_shared.dart';
 
@@ -18,51 +17,15 @@ class DatagridExample extends StatefulWidget {
 
 class _DatagridExampleState extends State<DatagridExample> {
   static const _columns = [
-    ColumnSpec(
-      id: 'sku',
-      header: 'SKU',
-      defaultWidth: 110,
-      defaultFrozen: FrozenSide.start,
-    ),
+    ColumnSpec(id: 'sku', header: 'SKU', defaultWidth: 110, defaultFrozen: FrozenSide.start),
     ColumnSpec(id: 'name', header: 'Product', defaultWidth: 220),
     ColumnSpec(id: 'category', header: 'Category', defaultWidth: 130),
-    ColumnSpec(
-      id: 'stock',
-      header: 'Stock',
-      defaultWidth: 90,
-      kind: CellKind.number,
-    ),
-    ColumnSpec(
-      id: 'price',
-      header: 'Price',
-      defaultWidth: 100,
-      kind: CellKind.number,
-    ),
-    ColumnSpec(
-      id: 'cost',
-      header: 'Cost',
-      defaultWidth: 100,
-      kind: CellKind.number,
-    ),
-    ColumnSpec(
-      id: 'margin',
-      header: 'Margin %',
-      defaultWidth: 100,
-      kind: CellKind.number,
-      defaultFrozen: FrozenSide.end,
-    ),
-    ColumnSpec(
-      id: 'active',
-      header: 'Active',
-      defaultWidth: 80,
-      kind: CellKind.bool_,
-    ),
-    ColumnSpec(
-      id: 'restock',
-      header: 'Restock',
-      defaultWidth: 130,
-      kind: CellKind.date,
-    ),
+    ColumnSpec(id: 'stock', header: 'Stock', defaultWidth: 90, kind: CellKind.number),
+    ColumnSpec(id: 'price', header: 'Price', defaultWidth: 100, kind: CellKind.number),
+    ColumnSpec(id: 'cost', header: 'Cost', defaultWidth: 100, kind: CellKind.number),
+    ColumnSpec(id: 'margin', header: 'Margin %', defaultWidth: 100, kind: CellKind.number, defaultFrozen: FrozenSide.end),
+    ColumnSpec(id: 'active', header: 'Active', defaultWidth: 80, kind: CellKind.bool_),
+    ColumnSpec(id: 'restock', header: 'Restock', defaultWidth: 130, kind: CellKind.date),
     ColumnSpec(id: 'supplier', header: 'Supplier', defaultWidth: 180),
   ];
 
@@ -79,10 +42,7 @@ class _DatagridExampleState extends State<DatagridExample> {
     super.initState();
     _schema = GridSchema(
       columns: _columns,
-      rows: [
-        for (var i = 0; i < 200; i++)
-          RowSpec(id: 'p_${i.toString().padLeft(3, '0')}'),
-      ],
+      rows: [for (var i = 0; i < 200; i++) RowSpec(id: 'p_${i.toString().padLeft(3, '0')}')],
     );
     _build(async: false);
   }
@@ -107,8 +67,7 @@ class _DatagridExampleState extends State<DatagridExample> {
         fetchRange: (start, end) async {
           await Future<void>.delayed(const Duration(milliseconds: 600));
           if (!mounted) {
-            return AsyncPage(
-                rowIds: rowIds.sublist(start, end), cells: const {});
+            return AsyncPage(rowIds: rowIds.sublist(start, end), cells: const {});
           }
           setState(() => _asyncLoads++);
           final cells = <RowId, Map<ColId, CellValue>>{};
@@ -137,13 +96,7 @@ class _DatagridExampleState extends State<DatagridExample> {
 
   Map<ColId, CellValue> _mockCellsFor(int i) {
     const cats = ['Cable', 'Adapter', 'Battery', 'Sensor', 'Module'];
-    const suppliers = [
-      'Acme Corp',
-      'Globex',
-      'Initech',
-      'Soylent',
-      'Umbrella'
-    ];
+    const suppliers = ['Acme Corp', 'Globex', 'Initech', 'Soylent', 'Umbrella'];
     final cat = cats[i % cats.length];
     final sup = suppliers[(i * 7) % suppliers.length];
     final price = 12.0 + (i * 3 % 47) + (i % 5) * 0.25;
@@ -160,8 +113,7 @@ class _DatagridExampleState extends State<DatagridExample> {
       'cost': NumberCell(double.parse(cost.toStringAsFixed(2))),
       'margin': NumberCell(double.parse(margin.toStringAsFixed(1))),
       'active': BoolCell(active),
-      'restock': DateCell(
-          DateTime(2026, 5, 12).add(Duration(days: (i * 5) % 90))),
+      'restock': DateCell(DateTime(2026, 5, 12).add(Duration(days: (i * 5) % 90))),
       'supplier': TextCell(sup),
     };
   }
@@ -203,22 +155,13 @@ class _DatagridExampleState extends State<DatagridExample> {
               ),
               child: UltimateTable(
                 controller: _controller,
-                headerBuilder: (ctx, colId) =>
-                    HeaderLabel(controller: _controller, colId: colId),
-                onHeaderTap: (cellCtx, colId) => showUltimateColumnMenu(
-                  context: cellCtx,
-                  controller: _controller,
-                  colId: colId,
-                ),
+                headerBuilder: (ctx, colId) => HeaderLabel(controller: _controller, colId: colId),
+                onHeaderTap: (cellCtx, colId) => showUltimateColumnMenu(context: cellCtx, controller: _controller, colId: colId),
               ),
             ),
           ),
           const SizedBox(height: 6),
-          _StatusBar(
-            controller: _controller,
-            onCopy: _copy,
-            lastCopy: _lastCopy,
-          ),
+          _StatusBar(controller: _controller, onCopy: _copy, lastCopy: _lastCopy),
         ],
       ),
     );
@@ -238,22 +181,16 @@ class _DatagridExampleState extends State<DatagridExample> {
             }
           },
           icon: const Icon(Icons.visibility_outlined, size: 14),
-          label: Text(
-              'Show hidden (${_controller.hiddenColumns.length})'),
+          label: Text('Show hidden (${_controller.hiddenColumns.length})'),
         ),
         FilterChip(
-          label: Text(_async
-              ? 'Async ($_asyncLoads pages)'
-              : 'Sync (instant)'),
+          label: Text(_async ? 'Async ($_asyncLoads pages)' : 'Sync (instant)'),
           selected: _async,
           onSelected: (v) => setState(() {
             _async = v;
             _build(async: v);
           }),
-          avatar: Icon(
-            _async ? Icons.cloud_download : Icons.bolt,
-            size: 14,
-          ),
+          avatar: Icon(_async ? Icons.cloud_download : Icons.bolt, size: 14),
         ),
       ],
     );
@@ -264,11 +201,7 @@ class _StatusBar extends StatefulWidget {
   final GridController controller;
   final VoidCallback onCopy;
   final String? lastCopy;
-  const _StatusBar({
-    required this.controller,
-    required this.onCopy,
-    required this.lastCopy,
-  });
+  const _StatusBar({required this.controller, required this.onCopy, required this.lastCopy});
   @override
   State<_StatusBar> createState() => _StatusBarState();
 }
@@ -305,7 +238,7 @@ class _StatusBarState extends State<_StatusBar> {
     final desc = sel.isEmpty
         ? 'No selection'
         : '$ranges range${ranges == 1 ? "" : "s"}, '
-            'active=${_describe(sel.activeRange!)}';
+              'active=${_describe(sel.activeRange!)}';
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       decoration: const BoxDecoration(
@@ -317,13 +250,11 @@ class _StatusBarState extends State<_StatusBar> {
         spacing: 12,
         runSpacing: 4,
         children: [
-          Text('$view rows  ·  $desc',
-              style: const TextStyle(fontSize: 12)),
+          Text('$view rows  ·  $desc', style: const TextStyle(fontSize: 12)),
           if (widget.lastCopy != null)
             Text(
               'Copied: ${widget.lastCopy}',
-              style:
-                  const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+              style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
