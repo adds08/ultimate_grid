@@ -19,7 +19,9 @@ class SiteShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
-    final compact = width < 760;
+    // The full brand bar (brand + 4 nav links + 2 icon links) needs ~810px;
+    // below this it collapses to the drawer so the nav never overflows.
+    final compact = width < 860;
     final location = GoRouterState.of(context).uri.path;
 
     return Scaffold(

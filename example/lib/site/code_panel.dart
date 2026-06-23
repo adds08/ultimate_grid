@@ -41,10 +41,22 @@ class _CodePanelState extends State<CodePanel> {
   bool _copied = false;
   bool _expanded = false;
 
+  // Explicit controllers: a visible Scrollbar requires its own controller
+  // (it cannot borrow the PrimaryScrollController, and two would collide).
+  final ScrollController _hCtrl = ScrollController();
+  final ScrollController _vCtrl = ScrollController();
+
   @override
   void initState() {
     super.initState();
     _future = _load();
+  }
+
+  @override
+  void dispose() {
+    _hCtrl.dispose();
+    _vCtrl.dispose();
+    super.dispose();
   }
 
   @override
@@ -143,8 +155,10 @@ class _CodePanelState extends State<CodePanel> {
         );
 
         Widget scroller = Scrollbar(
+          controller: _hCtrl,
           thumbVisibility: true,
           child: SingleChildScrollView(
+            controller: _hCtrl,
             scrollDirection: Axis.horizontal,
             child: ConstrainedBox(
               constraints: BoxConstraints(
@@ -159,8 +173,9 @@ class _CodePanelState extends State<CodePanel> {
           scroller = SizedBox(
             height: viewportHeight,
             child: Scrollbar(
+              controller: _vCtrl,
               thumbVisibility: true,
-              child: SingleChildScrollView(child: scroller),
+              child: SingleChildScrollView(controller: _vCtrl, child: scroller),
             ),
           );
         }
