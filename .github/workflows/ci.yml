@@ -47,9 +47,11 @@ jobs:
         with:
           channel: stable
 
-      - name: Build example for web
+      - name: Build & smoke-test the showcase
         working-directory: example
         run: |
           flutter pub get
           dart run tool/sync_assets.dart
+          flutter analyze
+          flutter test
           flutter build web --no-wasm-dry-run

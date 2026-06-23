@@ -106,6 +106,8 @@
 | `search_field_test.dart` | low (test-only) | 2 tests asserted the pre-refactor Material API (`find.byType(TextField)`, `find.text('Highlight')`); widget is now framework-agnostic `EditableText` with glyph labels | ✅ Fixed 2026-06-23 — finders updated to `EditableText` / `textContaining` |
 | `UltimateSearchField` `FocusNode()` in `build()` | low | A new `FocusNode` was constructed every `build()`, orphaned and never disposed (Flutter anti-pattern) | ✅ Fixed 2026-06-23 — hoisted to a `State` field, disposed in `dispose()` |
 | `UltimateSearchField.hintText` unused | low (UX) | Public, documented param had no effect — `EditableText` renders no hint, so the placeholder never showed | ✅ Fixed 2026-06-23 — empty-state hint overlay via `ValueListenableBuilder` |
+| Showcase brand bar overflow (`example/site/site_shell.dart`) | low (showcase-only) | Nav bar overflowed 32px between the 760px breakpoint and the ~810px it needs to fit | ✅ Fixed 2026-06-23 — breakpoint raised to 860px; caught by new `example/test/smoke_test.dart` |
+| Showcase `CodePanel` Scrollbar (`example/site/code_panel.dart`) | low (showcase-only) | `Scrollbar(thumbVisibility: true)` had no `ScrollController` → runtime assertion when a code panel rendered | ✅ Fixed 2026-06-23 — explicit `ScrollController` per scrollbar; covered by smoke test |
 
 ## Quality improvements to consider
 
