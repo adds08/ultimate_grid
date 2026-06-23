@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_highlight/flutter_highlight.dart';
+import 'package:flutter_highlight/themes/atom-one-dark.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:markdown/markdown.dart' as md;
 
 import '../links.dart';
 import '../site_shell.dart';
 
 /// Renders a markdown asset loaded via rootBundle into a styled, scrollable
-/// pane. Used by both the Docs and Roadmap pages.
+/// pane. Used by both the Docs and Roadmap pages. Fenced code blocks are
+/// syntax-highlighted with the same theme as the live-example CodePanel so
+/// docs and examples read identically.
 class MarkdownView extends StatefulWidget {
   /// Asset key, e.g. `assets/docs/getting-started.md`.
   final String assetPath;
@@ -57,8 +62,64 @@ class _MarkdownViewState extends State<MarkdownView> {
             if (href != null && href.startsWith('http')) openExternal(href);
           },
           styleSheet: _styleSheet(context),
+          builders: {'code': _CodeBlockBuilder()},
         );
       },
+    );
+  }
+}
+
+/// Renders fenced code blocks with syntax highlighting. Inline code
+/// (single-line, no language class) returns null so the default `code`
+/// pill style applies.
+class _CodeBlockBuilder extends MarkdownElementBuilder {
+  static const _supported = {
+    'dart',
+    'yaml',
+    'yml',
+    'json',
+    'bash',
+    'shell',
+    'sh',
+  };
+
+  @override
+  Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) {
+    final cls = element.attributes['class'];
+    final hasLang = cls != null && cls.startsWith('language-');
+    final text = element.textContent.trimRight();
+    final isBlock = hasLang || text.contains('\n');
+    if (!isBlock) return null; // inline code → default styling
+
+    var lang = hasLang ? cls.substring('language-'.length) : 'dart';
+    if (lang == 'yml') lang = 'yaml';
+    if (lang == 'sh' || lang == 'shell') lang = 'bash';
+    if (!_supported.contains(lang)) lang = 'dart';
+
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      decoration: BoxDecoration(
+        color: const Color(0xFF282C34),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color(0xFF1F232B)),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: HighlightView(
+          text,
+          language: lang,
+          theme: atomOneDarkTheme,
+          padding: const EdgeInsets.all(16),
+          textStyle: const TextStyle(
+            fontFamily: 'monospace',
+            fontFamilyFallback: ['Menlo', 'Consolas', 'monospace'],
+            fontSize: 13,
+            height: 1.5,
+          ),
+        ),
+      ),
     );
   }
 }
@@ -88,17 +149,15 @@ MarkdownStyleSheet _styleSheet(BuildContext context) {
       color: kBrandOrange,
       decoration: TextDecoration.underline,
     ),
+    // Inline code only (fenced blocks are handled by _CodeBlockBuilder).
     code: const TextStyle(
       fontFamily: 'monospace',
+      fontFamilyFallback: ['Menlo', 'Consolas', 'monospace'],
       fontSize: 13,
       backgroundColor: Color(0xFFF1F5F9),
       color: Color(0xFFBE123C),
     ),
-    codeblockDecoration: BoxDecoration(
-      color: const Color(0xFF282C34),
-      borderRadius: BorderRadius.circular(10),
-    ),
-    codeblockPadding: const EdgeInsets.all(16),
+    codeblockPadding: EdgeInsets.zero,
     blockquoteDecoration: BoxDecoration(
       color: const Color(0xFFFFFBF5),
       border: const Border(left: BorderSide(color: kBrandOrange, width: 3)),

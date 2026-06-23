@@ -1,5 +1,40 @@
 # Changelog
 
+## 0.2.0 — Documentation, live showcase & search-field fixes
+
+> **No breaking changes.** The public API is identical to 0.1.x — existing code
+> compiles and behaves the same. The only behavior change is that
+> `UltimateSearchField`'s `hintText` now actually renders (it was previously a
+> no-op). No types, parameters, or exports were removed or renamed.
+
+### Added
+
+- **Full documentation set** under [`docs/`](docs/) — the single source of
+  truth: getting started, concepts, columns, cells & rendering, data sources,
+  interaction, sort/filter/search, theming, performance, recipes, plus a
+  status/roadmap. Linked from the README and rendered in the live demo.
+- **Live showcase site** (the `example/` app), modelled on bootstrap-table:
+  deep-linkable routes, a hero/home, categorized live examples — each with
+  copy-pasteable source loaded from the actual running demo files — in-app docs,
+  and a roadmap page. Deployed to GitHub Pages.
+- **README badges** (pub version / points / likes / publisher, CI, stars,
+  license), a links bar, and a shipped/planned feature matrix.
+
+### Fixed
+
+- `UltimateSearchField` constructed a new `FocusNode` inside `build()` on every
+  rebuild — orphaned and never disposed. It is now a `State` field disposed in
+  `dispose()`.
+- `UltimateSearchField.hintText` was a documented but unused parameter; the
+  placeholder now renders when the field is empty.
+
+### Repository
+
+- The GitHub repository was renamed `flutter_grid_package` → `ultimate_grid`
+  (old URLs redirect automatically). The **pub package name is unchanged**.
+- Added GitHub Actions: CI (analyze / test / format / publish dry-run / web
+  build) and a Pages deploy for the showcase.
+
 ## 0.1.1 — Docs polish
 
 - README H1 now reads "Ultimate Grid" (was `ultimate_grid`) so the
