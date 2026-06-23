@@ -46,7 +46,9 @@ class PredicatePolicy<T extends Object> extends InteractionPolicy<T> {
 
   /// Helper: "every cell where both indices are even".
   static PredicatePolicy<T> evenCells<T extends Object>(T value) =>
-      PredicatePolicy<T>((r, c, _, __) => (r.isEven && c.isEven) ? value : null);
+      PredicatePolicy<T>(
+        (r, c, _, __) => (r.isEven && c.isEven) ? value : null,
+      );
 }
 
 @immutable

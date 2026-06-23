@@ -41,7 +41,10 @@ void main() {
           ColumnSpec(id: 'a', header: 'A'),
           ColumnSpec(id: 'b', header: 'B'),
         ],
-        rows: const [RowSpec(id: 'r1'), RowSpec(id: 'r2')],
+        rows: const [
+          RowSpec(id: 'r1'),
+          RowSpec(id: 'r2'),
+        ],
       );
       final src = MapGridDataSource(rowIds: ['r1', 'r2'], colIds: ['a', 'b']);
       return GridController(schema: schema, source: src);

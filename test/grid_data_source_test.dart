@@ -42,10 +42,7 @@ void main() {
     });
 
     test('removeColumn cleans cells and metadata across rows', () {
-      final src = MapGridDataSource(
-        rowIds: ['r1', 'r2'],
-        colIds: ['c1', 'c2'],
-      );
+      final src = MapGridDataSource(rowIds: ['r1', 'r2'], colIds: ['c1', 'c2']);
       src.setValue('r1', 'c1', const NumberCell(1));
       src.setValue('r2', 'c1', const NumberCell(2));
       src.setMetadata('r1', 'c1', 'm1');

@@ -55,12 +55,7 @@ class _OfficeTimeLogScreenState extends State<OfficeTimeLogScreen> {
     final snap = _state.snapshot;
     _schema = _buildSchema(snap);
     _source = MapGridDataSource(
-      rowIds: [
-        _headerRowId,
-        _budgetRowId,
-        ...snap.engineerIds,
-        _totalsRowId,
-      ],
+      rowIds: [_headerRowId, _budgetRowId, ...snap.engineerIds, _totalsRowId],
       colIds: [
         _engineerColId,
         ...snap.columnIds,
@@ -75,25 +70,30 @@ class _OfficeTimeLogScreenState extends State<OfficeTimeLogScreen> {
 
   void _syncFromState() {
     final snap = _state.snapshot;
-    final needRebuild = !_listEquals(
+    final needRebuild =
+        !_listEquals(
           snap.engineerIds,
           _schema!.rows
               .map((r) => r.id)
-              .where((id) =>
-                  id != _headerRowId &&
-                  id != _budgetRowId &&
-                  id != _totalsRowId)
+              .where(
+                (id) =>
+                    id != _headerRowId &&
+                    id != _budgetRowId &&
+                    id != _totalsRowId,
+              )
               .toList(),
         ) ||
         !_listEquals(
           snap.columnIds,
           _schema!.columns
               .map((c) => c.id)
-              .where((id) =>
-                  id != _engineerColId &&
-                  id != _hoursColId &&
-                  id != _otColId &&
-                  id != _compColId)
+              .where(
+                (id) =>
+                    id != _engineerColId &&
+                    id != _hoursColId &&
+                    id != _otColId &&
+                    id != _compColId,
+              )
               .toList(),
         );
     if (needRebuild) {
@@ -171,8 +171,7 @@ class _OfficeTimeLogScreenState extends State<OfficeTimeLogScreen> {
           defaultFrozen: FrozenSide.start,
           defaultFreezePriority: 1,
         ),
-        for (final eid in snap.engineerIds)
-          RowSpec(id: eid, defaultHeight: 44),
+        for (final eid in snap.engineerIds) RowSpec(id: eid, defaultHeight: 44),
         const RowSpec(
           id: _totalsRowId,
           defaultHeight: 44,
@@ -187,18 +186,20 @@ class _OfficeTimeLogScreenState extends State<OfficeTimeLogScreen> {
       final row = snap.cells[eid];
       for (final tid in snap.columnIds) {
         final v = row?[tid] ?? 0;
-        _source.setValue(
-          eid,
-          tid,
-          v == 0 ? const EmptyCell() : NumberCell(v),
-        );
+        _source.setValue(eid, tid, v == 0 ? const EmptyCell() : NumberCell(v));
       }
       final hours = _state.rowHours(eid);
       final ot = _state.rowOt(eid);
       _source.setValue(
-          eid, _hoursColId, hours == 0 ? const EmptyCell() : NumberCell(hours));
+        eid,
+        _hoursColId,
+        hours == 0 ? const EmptyCell() : NumberCell(hours),
+      );
       _source.setValue(
-          eid, _otColId, ot == 0 ? const EmptyCell() : NumberCell(ot));
+        eid,
+        _otColId,
+        ot == 0 ? const EmptyCell() : NumberCell(ot),
+      );
     }
     for (final tid in snap.columnIds) {
       final q = snap.budgets[tid] ?? 0;
@@ -309,8 +310,10 @@ class _OfficeTimeLogScreenState extends State<OfficeTimeLogScreen> {
         items: available,
         renderTile: (e) => ListTile(
           dense: true,
-          title: Text(e.displayName,
-              style: const TextStyle(fontSize: 14, color: Color(0xFF0F172A))),
+          title: Text(
+            e.displayName,
+            style: const TextStyle(fontSize: 14, color: Color(0xFF0F172A)),
+          ),
           subtitle: Text(
             '${e.role} · #${e.employeeNumber}',
             style: const TextStyle(fontSize: 13, color: Color(0xFF64748B)),
@@ -325,8 +328,9 @@ class _OfficeTimeLogScreenState extends State<OfficeTimeLogScreen> {
   }
 
   void _showAddSubTask() {
-    final available =
-        kAllSubTasks.where((t) => !_state.columnIds.contains(t.id)).toList();
+    final available = kAllSubTasks
+        .where((t) => !_state.columnIds.contains(t.id))
+        .toList();
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
@@ -335,20 +339,29 @@ class _OfficeTimeLogScreenState extends State<OfficeTimeLogScreen> {
         items: available,
         renderTile: (t) => ListTile(
           dense: true,
-          title: Text.rich(TextSpan(children: [
+          title: Text.rich(
             TextSpan(
-                text: t.code,
-                style: const TextStyle(
+              children: [
+                TextSpan(
+                  text: t.code,
+                  style: const TextStyle(
                     fontFamily: 'Menlo',
                     fontWeight: FontWeight.w600,
                     fontSize: 12,
-                    color: Color(0xFF0F172A))),
-            const TextSpan(text: '  '),
-            TextSpan(
-                text: t.name,
-                style:
-                    const TextStyle(fontSize: 14, color: Color(0xFF0F172A))),
-          ])),
+                    color: Color(0xFF0F172A),
+                  ),
+                ),
+                const TextSpan(text: '  '),
+                TextSpan(
+                  text: t.name,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFF0F172A),
+                  ),
+                ),
+              ],
+            ),
+          ),
           subtitle: Text(
             'Project ${t.projectCode ?? "-"} · ${t.unitOfMeasure ?? "-"}',
             style: const TextStyle(fontSize: 13, color: Color(0xFF64748B)),
@@ -526,8 +539,11 @@ class _EngineerInfoTile extends StatelessWidget {
                 borderRadius: BorderRadius.circular(4),
                 color: Colors.white,
               ),
-              child: const Icon(Icons.close,
-                  size: 12, color: Color(0xFF64748B)),
+              child: const Icon(
+                Icons.close,
+                size: 12,
+                color: Color(0xFF64748B),
+              ),
             ),
           ),
           const SizedBox(width: 6),
@@ -815,19 +831,20 @@ class _PickList<T> extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 20, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               decoration: const BoxDecoration(
-                border: Border(
-                    bottom: BorderSide(color: Color(0xFFE2E8F0))),
+                border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
               ),
               child: Row(
                 children: [
-                  Text(title,
-                      style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF0F172A))),
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF0F172A),
+                    ),
+                  ),
                   const Spacer(),
                   IconButton(
                     icon: const Icon(Icons.close, size: 18),
@@ -839,8 +856,10 @@ class _PickList<T> extends StatelessWidget {
             if (items.isEmpty)
               const Padding(
                 padding: EdgeInsets.all(24),
-                child: Text('Nothing left to add',
-                    style: TextStyle(fontSize: 13, color: Color(0xFF64748B))),
+                child: Text(
+                  'Nothing left to add',
+                  style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+                ),
               )
             else
               Flexible(

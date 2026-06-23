@@ -34,8 +34,18 @@ class _BudgetExampleState extends State<BudgetExample> {
   static const _totalsRowId = '__totals';
 
   static const _months = <String>[
-    'jan', 'feb', 'mar', 'apr', 'may', 'jun',
-    'jul', 'aug', 'sep', 'oct', 'nov', 'dec',
+    'jan',
+    'feb',
+    'mar',
+    'apr',
+    'may',
+    'jun',
+    'jul',
+    'aug',
+    'sep',
+    'oct',
+    'nov',
+    'dec',
   ];
 
   late final List<_Category> _categories;
@@ -147,12 +157,14 @@ class _BudgetExampleState extends State<BudgetExample> {
 
   void _addQuarterMerges() {
     for (var q = 0; q < 4; q++) {
-      _source.addMerge(MergeRange(
-        anchorRow: _quarterRowId,
-        anchorCol: _months[q * 3],
-        rowSpan: 1,
-        colSpan: 3,
-      ));
+      _source.addMerge(
+        MergeRange(
+          anchorRow: _quarterRowId,
+          anchorCol: _months[q * 3],
+          rowSpan: 1,
+          colSpan: 3,
+        ),
+      );
     }
   }
 
@@ -194,8 +206,11 @@ class _BudgetExampleState extends State<BudgetExample> {
       final budgetCell = _source.valueAt(c.id, _budgetColId);
       final budget = budgetCell is NumberCell ? budgetCell.value : 0.0;
       _source.setValue(c.id, _totalColId, NumberCell(_round(spent)));
-      _source.setValue(c.id, _percentColId,
-          NumberCell(budget == 0 ? 0 : _round((spent / budget) * 100)));
+      _source.setValue(
+        c.id,
+        _percentColId,
+        NumberCell(budget == 0 ? 0 : _round((spent / budget) * 100)),
+      );
     }
     // Monthly column totals + grand totals.
     var grandSpend = 0.0;
@@ -204,7 +219,11 @@ class _BudgetExampleState extends State<BudgetExample> {
       grandBudget += c.budget;
     }
     _source.setValue(_totalsRowId, _categoryColId, const TextCell('TOTAL'));
-    _source.setValue(_totalsRowId, _budgetColId, NumberCell(_round(grandBudget)));
+    _source.setValue(
+      _totalsRowId,
+      _budgetColId,
+      NumberCell(_round(grandBudget)),
+    );
     for (final m in _months) {
       var monthTotal = 0.0;
       for (final c in _categories) {
@@ -215,8 +234,13 @@ class _BudgetExampleState extends State<BudgetExample> {
       grandSpend += monthTotal;
     }
     _source.setValue(_totalsRowId, _totalColId, NumberCell(_round(grandSpend)));
-    _source.setValue(_totalsRowId, _percentColId,
-        NumberCell(_round(grandBudget == 0 ? 0 : (grandSpend / grandBudget) * 100)));
+    _source.setValue(
+      _totalsRowId,
+      _percentColId,
+      NumberCell(
+        _round(grandBudget == 0 ? 0 : (grandSpend / grandBudget) * 100),
+      ),
+    );
   }
 
   static double _round(double v) => double.parse(v.toStringAsFixed(2));
@@ -236,12 +260,19 @@ class _BudgetExampleState extends State<BudgetExample> {
     _source.setValue(rowId, colId, value);
   }
 
-  Widget _cellWidget(BuildContext ctx, RowId rowId, ColId colId,
-      CellValue value) {
+  Widget _cellWidget(
+    BuildContext ctx,
+    RowId rowId,
+    ColId colId,
+    CellValue value,
+  ) {
     if (colId == _categoryColId) {
-      return _CategoryCell(rowId: rowId, categories: _categories,
-          isHeader: rowId == _quarterRowId || rowId == _headerRowId,
-          isTotals: rowId == _totalsRowId);
+      return _CategoryCell(
+        rowId: rowId,
+        categories: _categories,
+        isHeader: rowId == _quarterRowId || rowId == _headerRowId,
+        isTotals: rowId == _totalsRowId,
+      );
     }
     if (colId == _percentColId) {
       if (rowId == _quarterRowId || rowId == _headerRowId) {
@@ -277,8 +308,8 @@ class _BudgetExampleState extends State<BudgetExample> {
               ),
               child: UltimateTable(
                 controller: _controller,
-                headerBuilder: (ctx, colId) => HeaderLabel(
-                    controller: _controller, colId: colId),
+                headerBuilder: (ctx, colId) =>
+                    HeaderLabel(controller: _controller, colId: colId),
                 widgetColumns: const {_categoryColId, _percentColId},
                 cellWidgetBuilder: _cellWidget,
                 onCellCommit: _onCommit,
@@ -298,7 +329,20 @@ class _BudgetExampleState extends State<BudgetExample> {
         icon: Icons.home_outlined,
         color: Color(0xFFEFF6FF),
         budget: 1600,
-        monthly: [1600, 1600, 1600, 1600, 1600, 1600, 1600, 1600, 1600, 1600, 1600, 1600],
+        monthly: [
+          1600,
+          1600,
+          1600,
+          1600,
+          1600,
+          1600,
+          1600,
+          1600,
+          1600,
+          1600,
+          1600,
+          1600,
+        ],
       ),
       _Category(
         id: 'utilities',
@@ -471,11 +515,17 @@ class _CategoryCell extends StatelessWidget {
         ),
       );
     }
-    final cat = categories.firstWhere((c) => c.id == rowId,
-        orElse: () => const _Category(
-              id: '', name: '?', icon: Icons.help_outline,
-              color: Color(0xFFE2E8F0), budget: 0, monthly: [],
-            ));
+    final cat = categories.firstWhere(
+      (c) => c.id == rowId,
+      orElse: () => const _Category(
+        id: '',
+        name: '?',
+        icon: Icons.help_outline,
+        color: Color(0xFFE2E8F0),
+        budget: 0,
+        monthly: [],
+      ),
+    );
     return Container(
       color: Colors.white,
       padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -519,9 +569,7 @@ class _PercentBar extends StatelessWidget {
     final over = percent > 100;
     final color = over
         ? const Color(0xFFDC2626)
-        : (percent > 85
-            ? const Color(0xFFEA580C)
-            : const Color(0xFF16A34A));
+        : (percent > 85 ? const Color(0xFFEA580C) : const Color(0xFF16A34A));
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       child: Column(
@@ -540,8 +588,11 @@ class _PercentBar extends StatelessWidget {
                 ),
               ),
               if (over)
-                const Icon(Icons.warning_amber_rounded,
-                    size: 14, color: Color(0xFFDC2626)),
+                const Icon(
+                  Icons.warning_amber_rounded,
+                  size: 14,
+                  color: Color(0xFFDC2626),
+                ),
             ],
           ),
           const SizedBox(height: 4),

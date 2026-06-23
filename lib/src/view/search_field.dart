@@ -31,6 +31,7 @@ class UltimateSearchField extends StatefulWidget {
 
 class _UltimateSearchFieldState extends State<UltimateSearchField> {
   late final TextEditingController _ctrl;
+  late final FocusNode _focus;
 
   @override
   void initState() {
@@ -39,11 +40,13 @@ class _UltimateSearchFieldState extends State<UltimateSearchField> {
     _ctrl.addListener(() {
       widget.controller.setSearchQuery(_ctrl.text);
     });
+    _focus = FocusNode();
   }
 
   @override
   void dispose() {
     _ctrl.dispose();
+    _focus.dispose();
     super.dispose();
   }
 
@@ -64,17 +67,38 @@ class _UltimateSearchFieldState extends State<UltimateSearchField> {
               padding: widget.padding,
               child: Row(
                 children: [
-                  const Text('🔍',
-                      style: TextStyle(fontSize: 13, color: Color(0xFF94A3B8))),
+                  const Text(
+                    '🔍',
+                    style: TextStyle(fontSize: 13, color: Color(0xFF94A3B8)),
+                  ),
                   const SizedBox(width: 6),
                   Expanded(
-                    child: EditableText(
-                      controller: _ctrl,
-                      focusNode: FocusNode(),
-                      style: const TextStyle(
-                          fontSize: 13, color: Color(0xFF0F172A)),
-                      cursorColor: const Color(0xFF7C3AED),
-                      backgroundCursorColor: const Color(0xFFE2E8F0),
+                    child: ValueListenableBuilder<TextEditingValue>(
+                      valueListenable: _ctrl,
+                      builder: (context, value, _) => Stack(
+                        children: [
+                          if (value.text.isEmpty)
+                            IgnorePointer(
+                              child: Text(
+                                widget.hintText,
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  color: Color(0xFF94A3B8),
+                                ),
+                              ),
+                            ),
+                          EditableText(
+                            controller: _ctrl,
+                            focusNode: _focus,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: Color(0xFF0F172A),
+                            ),
+                            cursorColor: const Color(0xFF7C3AED),
+                            backgroundCursorColor: const Color(0xFFE2E8F0),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],

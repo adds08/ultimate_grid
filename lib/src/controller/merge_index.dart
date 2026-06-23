@@ -36,18 +36,18 @@ class MergeIndex {
     required Map<int, _Span> anchors,
     required int rowCount,
     required int colCount,
-  })  : _occlusion = occlusion,
-        _anchorByCell = anchors,
-        _rowCount = rowCount,
-        _colCount = colCount;
+  }) : _occlusion = occlusion,
+       _anchorByCell = anchors,
+       _rowCount = rowCount,
+       _colCount = colCount;
 
   /// Empty index (no merges).
   factory MergeIndex.empty() => MergeIndex._(
-        occlusion: Uint32List(0),
-        anchors: const <int, _Span>{},
-        rowCount: 0,
-        colCount: 0,
-      );
+    occlusion: Uint32List(0),
+    anchors: const <int, _Span>{},
+    rowCount: 0,
+    colCount: 0,
+  );
 
   /// Compute from the raw merge declarations.
   ///
@@ -111,8 +111,10 @@ class MergeIndex {
       }
       if (!ok) continue;
 
-      anchors[_packCellIndex(anchorView, anchorCol, totalColCount)] =
-          _Span(m.rowSpan, m.colSpan);
+      anchors[_packCellIndex(anchorView, anchorCol, totalColCount)] = _Span(
+        m.rowSpan,
+        m.colSpan,
+      );
 
       for (var dr = 0; dr < m.rowSpan; dr++) {
         for (var dc = 0; dc < m.colSpan; dc++) {

@@ -44,7 +44,7 @@ flutter run -d chrome
 
 ## Reporting bugs
 
-[Open an issue](https://github.com/adds08/flutter_grid_package/issues)
+[Open an issue](https://github.com/adds08/ultimate_grid/issues)
 with:
 
 - Flutter version (`flutter --version`).

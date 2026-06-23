@@ -158,9 +158,7 @@ class GridController extends ChangeNotifier {
   /// Effective pin priority of row [id] among same-side frozen rows.
   /// Lower values render closer to the outside edge of the strip.
   int rowFreezePriorityOf(RowId id) =>
-      _rowFreezePriorities[id] ??
-      schema.row(id)?.defaultFreezePriority ??
-      0;
+      _rowFreezePriorities[id] ?? schema.row(id)?.defaultFreezePriority ?? 0;
 
   /// Resize column [id] to fit the widest visible cell. Caller supplies the
   /// [measure] callback (typically backed by a `TextPainter` or paragraph
@@ -196,7 +194,9 @@ class GridController extends ChangeNotifier {
   /// (default 40). No-op if the width is unchanged.
   void setColumnWidth(ColId id, double width) {
     final spec = schema.column(id);
-    final clamped = width < (spec?.minWidth ?? 40) ? (spec?.minWidth ?? 40) : width;
+    final clamped = width < (spec?.minWidth ?? 40)
+        ? (spec?.minWidth ?? 40)
+        : width;
     if (_columnWidths[id] == clamped) return;
     _columnWidths[id] = clamped;
     _bump(rebuildLayout: true);
@@ -294,43 +294,53 @@ class GridController extends ChangeNotifier {
 
   /// Set the selection to a single cell.
   void selectCell(int rowIndex, int colIndex, {CellAddress? focus}) {
-    setSelection(Selection(
-      ranges: [SelectionRange.cell(rowIndex, colIndex)],
-      focus: focus ?? _selection.focus,
-    ));
+    setSelection(
+      Selection(
+        ranges: [SelectionRange.cell(rowIndex, colIndex)],
+        focus: focus ?? _selection.focus,
+      ),
+    );
   }
 
   /// Shift-click / drag-extend: move the active range's extent.
   void extendSelectionTo(int rowIndex, int colIndex, {CellAddress? focus}) {
-    setSelection(_selection.extendActiveTo(
-      rowIndex: rowIndex,
-      colIndex: colIndex,
-      focus: focus,
-    ));
+    setSelection(
+      _selection.extendActiveTo(
+        rowIndex: rowIndex,
+        colIndex: colIndex,
+        focus: focus,
+      ),
+    );
   }
 
   /// Cmd/Ctrl-click: push a new single-cell range onto the existing list.
   void addSelectionRange(int rowIndex, int colIndex, {CellAddress? focus}) {
-    setSelection(_selection.addRange(
-      SelectionRange.cell(rowIndex, colIndex),
-      focus: focus,
-    ));
+    setSelection(
+      _selection.addRange(
+        SelectionRange.cell(rowIndex, colIndex),
+        focus: focus,
+      ),
+    );
   }
 
   /// Select an entire row (Excel "click on the row number" gesture).
   void selectRow(int rowIndex, {CellAddress? focus}) {
-    setSelection(Selection(
-      ranges: [SelectionRange.row(rowIndex)],
-      focus: focus ?? _selection.focus,
-    ));
+    setSelection(
+      Selection(
+        ranges: [SelectionRange.row(rowIndex)],
+        focus: focus ?? _selection.focus,
+      ),
+    );
   }
 
   /// Select an entire column (Excel "click on the column letter" gesture).
   void selectColumn(int colIndex, {CellAddress? focus}) {
-    setSelection(Selection(
-      ranges: [SelectionRange.column(colIndex)],
-      focus: focus ?? _selection.focus,
-    ));
+    setSelection(
+      Selection(
+        ranges: [SelectionRange.column(colIndex)],
+        focus: focus ?? _selection.focus,
+      ),
+    );
   }
 
   /// Select every cell in the visible view.
@@ -338,16 +348,18 @@ class GridController extends ChangeNotifier {
     final rows = pipelineResult.viewRowIndices.length;
     final cols = columnLayout.widths.length;
     if (rows == 0 || cols == 0) return;
-    setSelection(Selection(
-      ranges: [
-        SelectionRange(
-          anchorRowIndex: 0,
-          anchorColIndex: 0,
-          extentRowIndex: rows - 1,
-          extentColIndex: cols - 1,
-        ),
-      ],
-    ));
+    setSelection(
+      Selection(
+        ranges: [
+          SelectionRange(
+            anchorRowIndex: 0,
+            anchorColIndex: 0,
+            extentRowIndex: rows - 1,
+            extentColIndex: cols - 1,
+          ),
+        ],
+      ),
+    );
   }
 
   // --- mutations: sort / filter / search ---

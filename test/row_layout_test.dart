@@ -5,25 +5,28 @@ import 'package:ultimate_grid/ultimate_grid.dart';
 
 void main() {
   group('RowLayout', () {
-    test('frozen rows split into top/bottom strips by side, view excludes them', () {
-      final layout = RowLayout.compute(
-        allRowIdsInSchemaOrder: ['r1', 'r2', 'r3', 'r4', 'r5'],
-        viewRowIndices: Int32List.fromList([0, 1, 2, 3, 4]),
-        heightOf: (_) => 30,
-        freezeOf: (id) {
-          if (id == 'r1') return FrozenSide.start;
-          if (id == 'r5') return FrozenSide.end;
-          return null;
-        },
-        priorityOf: (_) => 0,
-      );
-      expect(layout.topFrozen, ['r1']);
-      expect(layout.bottomFrozen, ['r5']);
-      expect(layout.middleViewIndices.length, 3);
-      expect(layout.middleHeight, 90);
-      expect(layout.topFrozenHeight, 30);
-      expect(layout.bottomFrozenHeight, 30);
-    });
+    test(
+      'frozen rows split into top/bottom strips by side, view excludes them',
+      () {
+        final layout = RowLayout.compute(
+          allRowIdsInSchemaOrder: ['r1', 'r2', 'r3', 'r4', 'r5'],
+          viewRowIndices: Int32List.fromList([0, 1, 2, 3, 4]),
+          heightOf: (_) => 30,
+          freezeOf: (id) {
+            if (id == 'r1') return FrozenSide.start;
+            if (id == 'r5') return FrozenSide.end;
+            return null;
+          },
+          priorityOf: (_) => 0,
+        );
+        expect(layout.topFrozen, ['r1']);
+        expect(layout.bottomFrozen, ['r5']);
+        expect(layout.middleViewIndices.length, 3);
+        expect(layout.middleHeight, 90);
+        expect(layout.topFrozenHeight, 30);
+        expect(layout.bottomFrozenHeight, 30);
+      },
+    );
 
     test('firstVisibleMiddle scans cumulative offsets', () {
       final layout = RowLayout.compute(

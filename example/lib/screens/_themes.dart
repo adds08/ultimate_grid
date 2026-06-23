@@ -137,8 +137,10 @@ GridTheme _withAccent(GridTheme base, Color accent) {
     background: base.background,
     headerBackground: base.headerBackground,
     // 8% tint of the accent over the existing frozen-strip background.
-    frozenStripBackground:
-        Color.alphaBlend(accent.withValues(alpha: 0.08), base.background),
+    frozenStripBackground: Color.alphaBlend(
+      accent.withValues(alpha: 0.08),
+      base.background,
+    ),
     footerBackground: base.footerBackground,
     rowBanding: base.rowBanding,
     hoverHighlight: base.hoverHighlight,

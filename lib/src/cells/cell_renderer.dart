@@ -56,7 +56,7 @@ class CellRendererRegistry {
   final CellRenderer fallback;
 
   CellRendererRegistry({CellRenderer? fallback})
-      : fallback = fallback ?? const _TextFallback();
+    : fallback = fallback ?? const _TextFallback();
 
   void registerColumn(ColId id, CellRenderer r) => _byColumn[id] = r;
   void registerKind(CellKind kind, CellRenderer r) => _byKind[kind] = r;

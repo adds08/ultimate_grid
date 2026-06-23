@@ -74,35 +74,37 @@ void main() {
       expect(src.valueAt('r7', 'a'), const TextCell('A7'));
     });
 
-    test('invalidate(page:) drops a page and re-fetches on next read',
-        () async {
-      final rowIds = [for (var i = 0; i < 6; i++) 'r$i'];
-      var counter = 0;
-      final src = AsyncGridDataSource(
-        rowIds: rowIds,
-        colIds: const ['a'],
-        pageSize: 3,
-        fetchRange: (start, end) async {
-          counter++;
-          return AsyncPage(
-            rowIds: rowIds.sublist(start, end),
-            cells: {
-              for (var i = start; i < end; i++)
-                rowIds[i]: {'a': TextCell('v${counter}_$i')},
-            },
-          );
-        },
-      );
-      src.prefetchRow(0);
-      await Future<void>.delayed(const Duration(milliseconds: 10));
-      expect(src.valueAt('r0', 'a'), const TextCell('v1_0'));
+    test(
+      'invalidate(page:) drops a page and re-fetches on next read',
+      () async {
+        final rowIds = [for (var i = 0; i < 6; i++) 'r$i'];
+        var counter = 0;
+        final src = AsyncGridDataSource(
+          rowIds: rowIds,
+          colIds: const ['a'],
+          pageSize: 3,
+          fetchRange: (start, end) async {
+            counter++;
+            return AsyncPage(
+              rowIds: rowIds.sublist(start, end),
+              cells: {
+                for (var i = start; i < end; i++)
+                  rowIds[i]: {'a': TextCell('v${counter}_$i')},
+              },
+            );
+          },
+        );
+        src.prefetchRow(0);
+        await Future<void>.delayed(const Duration(milliseconds: 10));
+        expect(src.valueAt('r0', 'a'), const TextCell('v1_0'));
 
-      src.invalidate(page: 0);
-      // Now stale: returns placeholder and kicks a new fetch.
-      expect(src.valueAt('r0', 'a'), const TextCell('…'));
-      await Future<void>.delayed(const Duration(milliseconds: 10));
-      expect(src.valueAt('r0', 'a'), const TextCell('v2_0'));
-    });
+        src.invalidate(page: 0);
+        // Now stale: returns placeholder and kicks a new fetch.
+        expect(src.valueAt('r0', 'a'), const TextCell('…'));
+        await Future<void>.delayed(const Duration(milliseconds: 10));
+        expect(src.valueAt('r0', 'a'), const TextCell('v2_0'));
+      },
+    );
   });
 
   group('GridController selection helpers (Phase 8 additions)', () {
@@ -112,7 +114,10 @@ void main() {
           ColumnSpec(id: 'a', header: 'A'),
           ColumnSpec(id: 'b', header: 'B'),
         ],
-        rows: const [RowSpec(id: 'r0'), RowSpec(id: 'r1')],
+        rows: const [
+          RowSpec(id: 'r0'),
+          RowSpec(id: 'r1'),
+        ],
       );
       final src = MapGridDataSource(rowIds: ['r0', 'r1'], colIds: ['a', 'b']);
       return GridController(schema: schema, source: src);

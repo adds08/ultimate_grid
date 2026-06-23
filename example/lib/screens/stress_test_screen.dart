@@ -17,12 +17,7 @@ class StressTestExample extends StatefulWidget {
 }
 
 class _StressTestExampleState extends State<StressTestExample> {
-  static const _rowCountChoices = <int>[
-    10000,
-    100000,
-    1000000,
-    5000000,
-  ];
+  static const _rowCountChoices = <int>[10000, 100000, 1000000, 5000000];
 
   int _rowCount = 100000;
   final GridSchema _schema = _buildSchema();
@@ -118,8 +113,20 @@ class _StressTestExampleState extends State<StressTestExample> {
     setState(() {});
   }
 
-  static const _categories = ['Cable', 'Adapter', 'Battery', 'Sensor', 'Module'];
-  static const _suppliers = ['Acme Corp', 'Globex', 'Initech', 'Soylent', 'Umbrella'];
+  static const _categories = [
+    'Cable',
+    'Adapter',
+    'Battery',
+    'Sensor',
+    'Module',
+  ];
+  static const _suppliers = [
+    'Acme Corp',
+    'Globex',
+    'Initech',
+    'Soylent',
+    'Umbrella',
+  ];
 
   CellValue _generate(int i, ColId colId) {
     final cat = _categories[i % _categories.length];
@@ -148,9 +155,7 @@ class _StressTestExampleState extends State<StressTestExample> {
       case 'active':
         return BoolCell(active);
       case 'restock':
-        return DateCell(
-          DateTime(2026, 1, 1).add(Duration(days: i % 365)),
-        );
+        return DateCell(DateTime(2026, 1, 1).add(Duration(days: i % 365)));
       case 'supplier':
         return TextCell(sup);
     }
@@ -216,10 +221,7 @@ class _StressTestExampleState extends State<StressTestExample> {
           isDense: true,
           items: [
             for (final n in _rowCountChoices)
-              DropdownMenuItem<int>(
-                value: n,
-                child: Text(_format(n)),
-              ),
+              DropdownMenuItem<int>(value: n, child: Text(_format(n))),
           ],
           onChanged: (n) {
             if (n == null || n == _rowCount) return;
@@ -268,8 +270,12 @@ class _StressTestExampleState extends State<StressTestExample> {
   }
 
   static String _format(int n) {
-    if (n >= 1000000) return '${(n / 1000000).toStringAsFixed(n % 1000000 == 0 ? 0 : 1)} M';
-    if (n >= 1000) return '${(n / 1000).toStringAsFixed(n % 1000 == 0 ? 0 : 1)} k';
+    if (n >= 1000000) {
+      return '${(n / 1000000).toStringAsFixed(n % 1000000 == 0 ? 0 : 1)} M';
+    }
+    if (n >= 1000) {
+      return '${(n / 1000).toStringAsFixed(n % 1000 == 0 ? 0 : 1)} k';
+    }
     return n.toString();
   }
 }

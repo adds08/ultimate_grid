@@ -1,117 +1,58 @@
 # Ultimate Grid
 
-A scalable, themable 2D data-grid package for Flutter — a free, open-source
-alternative aimed at being more capable than `pluto_grid` and more ergonomic
-than the built-in `TwoDimensional` widgets, while scaling to millions of
-cells without jitter on low-end devices.
+[![pub version](https://img.shields.io/pub/v/ultimate_grid.svg)](https://pub.dev/packages/ultimate_grid)
+[![pub points](https://img.shields.io/pub/points/ultimate_grid)](https://pub.dev/packages/ultimate_grid/score)
+[![pub likes](https://img.shields.io/pub/likes/ultimate_grid)](https://pub.dev/packages/ultimate_grid/score)
+[![publisher](https://img.shields.io/pub/publisher/ultimate_grid)](https://pub.dev/publishers/codebigya.com)
+[![CI](https://github.com/adds08/ultimate_grid/actions/workflows/ci.yml/badge.svg)](https://github.com/adds08/ultimate_grid/actions/workflows/ci.yml)
+[![GitHub stars](https://img.shields.io/github/stars/adds08/ultimate_grid?style=flat&logo=github)](https://github.com/adds08/ultimate_grid/stargazers)
+[![license: MIT](https://img.shields.io/github/license/adds08/ultimate_grid)](LICENSE)
 
-> **Status:** in active development. The public API surface is stable for
-> Phase 3 (headless model + 9-region grid + custom `RenderObject` body).
+**A scalable, themable 2D data-grid for Flutter** — millions of cells without
+jitter, a 9-region freeze layout, cell merges, async data, Excel-style
+selection, sort / filter / search, and full theming. Free, open source, and
+framework-agnostic (the library depends only on `flutter/widgets.dart`).
 
-## Why this exists
+<!-- Drop a hero capture at docs/assets/hero.gif and uncomment:
+![Ultimate Grid](docs/assets/hero.gif)
+-->
 
-Around 2017–2020, I was a one-person stack working on a tablet app for a
-construction company. The headline screen was a timesheet — crews on one
-axis, cost codes on the other, hours in the middle, with phases and
-projects layered behind them in a relational backend. It was the most
-complex piece of UI I had built up to that point: cell mapping across
-schemas, multi-cell selection, multi-value entry, a custom on-screen
-keyboard, and the kind of state churn where every edit had to ripple into
-totals on the right and a quantity-to-claim band on the top. I was
-learning state management mid-flight; the code ended up a fan-out of
-providers and a backend that nested deeper than I'd like to admit. On the
-web side the same dataset was shown through a jQuery-driven
-`bootstrap-table` library, with PHP, SQL, CSS, the Flutter app, and the
-servers all sitting in the same week's todo list.
+> ### 🔗 Links
+> **[▶ Live demo & examples](https://adds08.github.io/ultimate_grid/)** ·
+> **[📖 Docs](docs/README.md)** ·
+> **[🧩 API reference](https://pub.dev/documentation/ultimate_grid/latest/)** ·
+> **[🗺️ Roadmap & limitations](docs/STATUS.md)** ·
+> **[pub.dev](https://pub.dev/packages/ultimate_grid)** ·
+> **[GitHub](https://github.com/adds08/ultimate_grid)**
+>
+> _Live demo goes live on the first push to `main` (GitHub Pages workflow)._
 
-I shipped it. It worked. It was also a stark reminder that Flutter, at
-the time, had no real grid ecosystem. `table_sticky_headers` covered the
-basic sticky-header case but wasn't flexible enough for where the
-timesheet was heading. When `TwoDimensional` arrived in the Flutter SDK
-a couple of years later I was hopeful — but it landed as a low-level
-building block, not a feature-grade grid, and the gap between "drawable
-viewport" and "actual datagrid" stayed wide.
+## Why Ultimate Grid
 
-Between contract gigs over the next few years I kept the unfinished grid
-in a side folder. It was too unpolished to publish — there were always
-five missing pieces — and I never had the focused stretch to finish them.
-With AI-assisted overhauls over the last year, I was finally able to do
-the surgery the package needed: replace the external table dependency
-with the canvas-paint body it has today, keep the original mental model
-(rows and columns are both data, edges freeze, totals derive), and
-produce something I could share without embarrassment. The same time-log
-shape that motivated this package — people on one axis, work items on
-the other, hours per cell, frozen edges, derived totals — ships as the
-**Office Time Log** demo in `example/` today, reframed for IT-industry
-projects but hosted on the new engine.
+- **Scales.** A custom `RenderObject` paints only the visible cell window via a
+  cached `TextPainter` LRU — no widget tree per cell. Smooth at millions of rows.
+- **Freezes like a spreadsheet.** 9 regions: left / right-frozen columns ×
+  top / bottom-frozen rows, including non-contiguous freezes by pin priority.
+- **Framework-agnostic.** Core uses only `flutter/widgets.dart` — no Material or
+  Cupertino lock-in. Plug your own popup/dialog UI (shadcn, Material, …) into the
+  column menu and filter dialog via builder callbacks.
+- **Themable to the cell.** A `GridTheme` floor with per-column / per-row /
+  per-cell overrides flowing through one `InteractionPolicy` shape.
 
-> Five clients later, the same package now ships under multiple production
-> apps. None of them are construction-shaped.
+## Install
 
-This is the artifact of that journey: the grid I wanted in 2018, written
-through 2026, for everyone who's hit the same wall.
+```yaml
+dependencies:
+  ultimate_grid: ^0.1.1
+```
 
-## What it does today (Phase 3)
-
-- **Matrix-map data model.** `GridDataSource` with sparse cell storage and a
-  lazy, sparse metadata side-channel that costs zero per-cell memory when
-  unused.
-- **Sealed `CellValue` types.** `Empty / Number / Text / Bool / Date / Formula
-  / Custom`. Strongly typed; renderers pattern-match.
-- **Per-cell behavior, explicit or by rule.** `InteractionPolicy<T>` with
-  `MapPolicy` (per-cell map) and `PredicatePolicy` (e.g.
-  `PredicatePolicy.evenCells(...)` — fires only on cells where both indices
-  are even). Both shapes compose with `overriddenBy`.
-- **9-region freeze layout.** Left-frozen / scrollable / right-frozen columns
-  × top-frozen / scrollable / bottom-frozen rows. Non-contiguous freezes
-  (e.g. freeze columns 1, 2, and 8 to the left) ordered by explicit pin
-  priority. All cumulative offsets in `Float64List`; binary-search
-  `firstVisibleMiddle`.
-- **Single-pass derived state.** `GridController` rebuilds column layout,
-  row layout, and the filter/sort/search pipeline once per revision —
-  not once per frame.
-- **Themable.** Default `GridTheme.mark85`. Per-column / per-row / per-cell
-  style overrides flow through the same `InteractionPolicy` shape.
-- **Pluggable cell renderers.** `CellRendererRegistry`: per-column override →
-  per-`CellKind` default → fallback. Defaults ship for number, text, bool,
-  date.
-- **Custom-render body.** A single `RenderUltimateBody` per column slice
-  paints visible cells directly via a cached `TextPainter` LRU — no widget
-  tree per cell. Bool cells render a filled tickbox; number cells are right
-  aligned with tabular figures. Tap opens a single overlay `TextField` for
-  edit-in-place; Enter commits, Esc cancels.
-- **Excel-style selection.** Drag inside the body to draw a rectangle;
-  Shift-click extends; Cmd/Ctrl-click pushes a non-contiguous range.
-  `Cmd/Ctrl+C` copies the bounding rectangle as TSV to the system clipboard
-  (round-trips with Excel / Numbers / Sheets). This is the package's
-  "web-like text copy" story — drag-to-highlight a substring inside a
-  cell would need a widget tree per cell, so it's intentionally not
-  supported in the body's fast paint path. Double-tap a cell to enter
-  the editor, where the `TextField` itself supports full text
-  selection / native context menu / copy.
-- **Cell merges.** Declare a `MergeRange` on the data source; the body
-  renderer skips occluded cells and expands the anchor to span the merge.
-  Merges that get split by sort / filter are silently dropped that frame.
-- **Drag-to-resize columns.** `UltimateResizableHeader` ships an 8-px
-  right-edge handle per column with a `resizeColumn` mouse cursor.
-- **Header menu + filter UI.** `showUltimateColumnMenu(...)` opens a
-  Material popup with sort, pin, hide, resize-to-fit, filter actions;
-  `showUltimateFilterDialog` ships type-appropriate inputs
-  (Contains for text/date, Min/Max for numbers). `Filters.*` are
-  pre-built predicates.
-- **Search field.** `UltimateSearchField` is a drop-in input; toggle
-  Highlight ↔ Filter mode to either mark matches or drop non-matches.
-- **Widget cells for interactive columns.** Pass `widgetColumns` +
-  `cellWidgetBuilder` to `UltimateTable` to render specific columns'
-  body cells as widgets instead of fast paragraph paint — useful when a
-  column needs checkboxes, buttons, or custom layouts. Other columns
-  keep the fast path.
+```dart
+import 'package:ultimate_grid/ultimate_grid.dart';
+```
 
 ## Quick start
 
 ```dart
-import 'package:ultimate_grid/ultimate_grid.dart';
-
 final schema = GridSchema(
   columns: const [
     ColumnSpec(id: 'sku', header: 'SKU', defaultWidth: 110,
@@ -137,34 +78,123 @@ final controller = GridController(schema: schema, source: source);
 UltimateTable(controller: controller);
 ```
 
-For a fuller gallery — financial sheet with merges, 100k-row async paging,
-search & filter UI, theme switcher with three presets, office time log,
-budget tracker, datagrid, spreadsheet, and a 5 M-row stress test — see the
-`example/` directory.
+A fuller gallery — financial sheet with merges, 100k-row async paging, search &
+filter UI, a theme switcher with three presets, office time log, budget tracker,
+datagrid, spreadsheet, and a 5 M-row stress test — ships in [`example/`](example/)
+and on the [live demo](https://adds08.github.io/ultimate_grid/).
+
+## Documentation
+
+Docs live in [`docs/`](docs/) and are the single source of truth. Start at the
+[docs index](docs/README.md), then read in order:
+
+| Guide | What it covers |
+|---|---|
+| [Getting started](docs/getting-started.md) | Install, the minimal grid, running the example |
+| [Concepts](docs/concepts.md) | Schema vs. source vs. controller vs. view; the 9 regions |
+| [Columns](docs/columns.md) | Width, freeze / pin, resize, reorder, hide, alignment, headers |
+| [Cells & rendering](docs/cells-and-rendering.md) | `CellValue` kinds, default + custom renderers, widget cells |
+| [Data sources](docs/data-sources.md) | `MapGridDataSource`, async paging, sparse data, merges |
+| [Interaction](docs/interaction.md) | Selection, clipboard TSV, in-cell editor, keyboard nav, policies |
+| [Sort / filter / search](docs/sort-filter-search.md) | Column menu, `Filters.*`, the view pipeline, search modes |
+| [Theming](docs/theming.md) | `GridTheme` fields, presets, per-column / row / cell overrides |
+| [Performance](docs/performance.md) | Canvas paint, paragraph cache, large-data and web notes |
+| [Recipes](docs/recipes.md) | Advanced: custom renderers, totals rows, custom menu UI |
+
+API specifics (every public symbol) are on
+[pub.dev/documentation](https://pub.dev/documentation/ultimate_grid/latest/).
+
+## Feature matrix
+
+✅ shipped · 🚧 in progress · 🗓️ planned — full detail in [docs/STATUS.md](docs/STATUS.md).
+
+| Capability | Status |
+|---|:--:|
+| Headless model (`GridSchema` / `GridDataSource` / `GridController`) | ✅ |
+| 9-region freeze (non-contiguous, pin priority) | ✅ |
+| Custom-paint body, no widget tree per cell (~5M rows) | ✅ |
+| Cell merges (`MergeRange`) | ✅ |
+| Excel-style selection + TSV clipboard copy | ✅ |
+| In-cell editor (double-tap, Enter / Esc) | ✅ |
+| Sort / filter / search (single-pass pipeline) | ✅ |
+| Column menu + type-aware filter dialog | ✅ |
+| Drag-resize + drag-reorder columns | ✅ |
+| Async / paged data source | ✅ |
+| Pluggable cell renderers + widget cells | ✅ |
+| `GridTheme` + per-column / row / cell overrides | ✅ |
+| Showcase site + tiered docs | 🚧 |
+| CSV / Excel export | 🗓️ |
+| Pagination widget · row grouping · frozen totals | 🗓️ |
+| RTL · accessibility · column virtualization | 🗓️ |
 
 ## Constraints
 
-- **Flutter web:** uses `Uint32List` for bitsets (JavaScript has no native
-  64-bit ints, so `Uint64List` isn't supported on web). Anything you add
-  internally must follow the same rule.
-- **No widget tree per cell in the body region.** Body cells are painted
-  directly by `RenderUltimateBody` via a paragraph LRU cache. The public
-  widget API is unchanged; the body region simply hosts a single
-  render-object widget per column slice plus one overlay editor widget.
+- **Flutter web:** bitsets use `Uint32List` (JavaScript has no native 64-bit
+  ints, so `Uint64List` isn't supported on web).
+- **No widget tree per cell in the body.** Body cells are painted directly, so
+  drag-to-highlight a substring inside one cell is intentionally unsupported —
+  double-tap to open the in-cell editor for full text selection.
+
+See [docs/STATUS.md](docs/STATUS.md) for the complete list of limitations and
+known issues.
 
 ## Architecture map
 
 ```
 src/
 ├── model/         CellValue, CellAddress, ColumnSpec, RowSpec, GridSchema, FrozenSide
-├── source/        GridDataSource (abstract) + MapGridDataSource
+├── source/        GridDataSource (abstract) + MapGridDataSource + AsyncGridDataSource
 ├── interaction/   InteractionPolicy: MapPolicy, PredicatePolicy, composition
-├── controller/    Selection, ColumnLayout, RowLayout, GridController
-├── filter_sort/   ViewPipeline (filter → sort → search; one pass)
+├── controller/    Selection, ColumnLayout, RowLayout, GridController, clipboard
+├── filter_sort/   ViewPipeline (filter → sort → search; one pass) + Filters
 ├── theme/         GridTheme, ColumnStyle, RowStyle, CellStyle
 ├── cells/         CellRenderer + registry; default Number/Text/Bool/Date renderers
-└── view/          SyncedScrollGroup, UltimateTable, UltimateTableHeader
+└── view/          UltimateTable, header, render body, column menu, search field
 ```
+
+<details>
+<summary><strong>Why this package exists</strong> (the origin story)</summary>
+
+Around 2017–2020, I was a one-person stack working on a tablet app for a
+construction company. The headline screen was a timesheet — crews on one axis,
+cost codes on the other, hours in the middle, with phases and projects layered
+behind them in a relational backend. It was the most complex piece of UI I had
+built up to that point: cell mapping across schemas, multi-cell selection,
+multi-value entry, a custom on-screen keyboard, and the kind of state churn
+where every edit had to ripple into totals on the right and a
+quantity-to-claim band on the top. On the web side the same dataset was shown
+through a jQuery-driven `bootstrap-table`, with PHP, SQL, CSS, the Flutter app,
+and the servers all in the same week's todo list.
+
+I shipped it. It worked. It was also a stark reminder that Flutter, at the
+time, had no real grid ecosystem. `table_sticky_headers` covered the basic
+sticky-header case but wasn't flexible enough. When `TwoDimensional` arrived in
+the SDK a couple of years later I was hopeful — but it landed as a low-level
+building block, not a feature-grade grid, and the gap between "drawable
+viewport" and "actual datagrid" stayed wide.
+
+Between contract gigs I kept the unfinished grid in a side folder. It was too
+unpolished to publish — always five missing pieces. With AI-assisted overhauls
+over the last year I finally did the surgery it needed: replaced the external
+table dependency with the canvas-paint body it has today, kept the original
+mental model (rows and columns are both data, edges freeze, totals derive), and
+produced something I could share. The same time-log shape that motivated this
+package ships as the **Office Time Log** demo in `example/` today, reframed for
+IT projects on the new engine.
+
+> Five clients later, the same package now ships under multiple production apps.
+> None of them are construction-shaped.
+
+This is the artifact of that journey: the grid I wanted in 2018, written
+through 2026, for everyone who's hit the same wall.
+
+</details>
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md). The hard rules inside `lib/`: web-safe
+bitsets only, no widget tree per cell on the paint path, doc comments on every
+public symbol.
 
 ## License
 

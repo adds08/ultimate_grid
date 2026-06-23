@@ -20,8 +20,18 @@ class _SpreadsheetExampleState extends State<SpreadsheetExample> {
   late GridController _controller;
 
   static const _months = [
-    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
   ];
   static const _quarters = ['Q1', 'Q2', 'Q3', 'Q4'];
   static const _regions = ['North', 'South', 'East', 'West', 'Central'];
@@ -88,8 +98,11 @@ class _SpreadsheetExampleState extends State<SpreadsheetExample> {
   void _seed() {
     final rng = math.Random(7);
     for (var q = 0; q < 4; q++) {
-      _source.setValue(_quarterRowId, _months[q * 3].toLowerCase(),
-          TextCell(_quarters[q]));
+      _source.setValue(
+        _quarterRowId,
+        _months[q * 3].toLowerCase(),
+        TextCell(_quarters[q]),
+      );
     }
     final perCol = <String, double>{};
     for (final r in _regions) {
@@ -98,33 +111,47 @@ class _SpreadsheetExampleState extends State<SpreadsheetExample> {
       for (final m in _months) {
         final v = (rng.nextDouble() * 90 + 10);
         _source.setValue(
-            r, m.toLowerCase(), NumberCell(double.parse(v.toStringAsFixed(1))));
+          r,
+          m.toLowerCase(),
+          NumberCell(double.parse(v.toStringAsFixed(1))),
+        );
         perCol[m.toLowerCase()] = (perCol[m.toLowerCase()] ?? 0) + v;
         rowTotal += v;
       }
       _source.setValue(
-          r, 'total', NumberCell(double.parse(rowTotal.toStringAsFixed(1))));
+        r,
+        'total',
+        NumberCell(double.parse(rowTotal.toStringAsFixed(1))),
+      );
     }
     _source.setValue(_totalsRowId, 'region', const TextCell('TOTAL'));
     var grand = 0.0;
     for (final m in _months) {
       final t = perCol[m.toLowerCase()] ?? 0;
-      _source.setValue(_totalsRowId, m.toLowerCase(),
-          NumberCell(double.parse(t.toStringAsFixed(1))));
+      _source.setValue(
+        _totalsRowId,
+        m.toLowerCase(),
+        NumberCell(double.parse(t.toStringAsFixed(1))),
+      );
       grand += t;
     }
-    _source.setValue(_totalsRowId, 'total',
-        NumberCell(double.parse(grand.toStringAsFixed(1))));
+    _source.setValue(
+      _totalsRowId,
+      'total',
+      NumberCell(double.parse(grand.toStringAsFixed(1))),
+    );
   }
 
   void _addMerges() {
     for (var q = 0; q < 4; q++) {
-      _source.addMerge(MergeRange(
-        anchorRow: _quarterRowId,
-        anchorCol: _months[q * 3].toLowerCase(),
-        rowSpan: 1,
-        colSpan: 3,
-      ));
+      _source.addMerge(
+        MergeRange(
+          anchorRow: _quarterRowId,
+          anchorCol: _months[q * 3].toLowerCase(),
+          rowSpan: 1,
+          colSpan: 3,
+        ),
+      );
     }
   }
 
@@ -163,7 +190,8 @@ class _SpreadsheetExampleState extends State<SpreadsheetExample> {
               ),
               TextButton.icon(
                 onPressed: () => _controller.selectColumn(
-                    _controller.columnLayout.indexOf['feb']!),
+                  _controller.columnLayout.indexOf['feb']!,
+                ),
                 icon: const Icon(Icons.view_column, size: 14),
                 label: const Text('Col "FEB"'),
               ),

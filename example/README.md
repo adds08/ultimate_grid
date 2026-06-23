@@ -1,66 +1,51 @@
-# ultimate_grid — example gallery
+# ultimate_grid — showcase site
 
-A side-nav shell lists each demo. The top bar carries a theme dropdown,
-a row of accent-color swatches, and a mobile-preview toggle so the same
-gallery doubles as a comparison tool: switch theme/accent without
-leaving the screen and the active demo rebuilds with the new
-`GridTheme` immediately.
+A bootstrap-table-style showcase for `ultimate_grid`, built as a Flutter web
+app: a marketing **Home**, a **Docs** section (renders the repo `docs/*.md`),
+an **Examples** gallery (live grids + their exact copy-pasteable source), and a
+**Roadmap** (`docs/STATUS.md`). Every page is deep-linkable via `go_router`.
 
-## Demos
+## Routes
 
-1. **Inventory** — schema + `MapGridDataSource` + `GridController` +
-   `UltimateTable`. The smallest runnable shape, with SKU frozen left
-   and Margin % frozen right.
-2. **Financial sheet** — quarter header strip merged across months via
-   `MergeRange`; top + bottom-frozen header / totals rows; left-frozen
-   region column; right-frozen `TOTAL` column.
-3. **Async paging (100k rows)** — `AsyncGridDataSource` fetching pages
-   of 50 on demand with a simulated network latency. Scroll fast to see
-   "Loading…" placeholders flash before pages resolve. Drop-down
-   adjusts the simulated latency.
-4. **Search & filters** — `UltimateSearchField` in Highlight ↔ Filter
-   mode + the per-column popup menu (`showUltimateColumnMenu`) with
-   sort / filter / pin / hide / fit. Filter dialog picks the right
-   input for the column kind: Contains for text/date, Min/Max for
-   numbers, true/false for bool.
+| Route | Page |
+|---|---|
+| `/` | Home — hero, badges, benefit chips, CTAs, feature cards, install |
+| `/examples` | Gallery overview (categorized left nav) |
+| `/examples/:id` | A single example — description, "what this shows", live grid, source |
+| `/docs` | Docs index (first available guide) |
+| `/docs/:page` | A single doc page rendered from `docs/<page>.md` |
+| `/roadmap` | `docs/STATUS.md` |
 
-## Theme switcher
+## Build / run
 
-The top-bar dropdown swaps between three `GridTheme` presets (see
-`lib/screens/_themes.dart`):
-
-- **Raw** — bare grayscale palette. The package surface with all
-  decoration stripped — useful as a "what does it look like before I
-  customize?" baseline.
-- **Elegant** — the orange-and-cream Mark 85 look. Mirrors the
-  package's [`GridTheme.mark85`] default.
-- **Professional** — slate / blue corporate palette with tabular
-  numeric weight and a brand-blue selection accent.
-
-The six swatches next to the dropdown override the accent of the
-active preset — selection stroke, focus stroke, and the soft
-frozen-strip tint. Click a swatch once to apply, click again to clear.
-Custom accent + preset combinations let you spin up "Professional + green"
-or "Elegant + purple" without touching code.
-
-## Mobile preview
-
-The phone icon in the top bar forces the layout into compact mode (sidebar
-becomes a drawer, body content is framed in a 380-pixel-wide card with a
-subtle shadow). Useful for sanity-checking how a demo reads on a phone
-without resizing the browser window.
-
-## Sidebar
-
-Collapse the sidebar to an icon-only rail via the hamburger button in
-its header. The selected demo stays highlighted and tooltips reveal the
-full label on hover.
+The Docs renderer and the CodePanels load the **real** repo docs and the
+**real** demo source files via `rootBundle`. A small script snapshots them into
+`assets/` so they ship as web assets (and so the code shown == the code that
+compiled). Run it before building:
 
 ```bash
 cd example
-flutter run
+dart run tool/sync_assets.dart          # snapshot docs + screen sources into assets/
+flutter run -d chrome                    # or:
+flutter build web --base-href /ultimate_grid/
 ```
 
-For the broader gallery (timesheets, budgets, 5M-row stress test) see
-the host repo at
-[`flutter_grid_package`](https://github.com/adds08/flutter_grid_package).
+`assets/source/` and `assets/docs/` are generated (git-ignored); the single
+authored copies live in `example/lib/screens/` and the repo `docs/` folder.
+
+## CodePanel — zero code drift
+
+`lib/site/code_panel.dart` shows Dart/YAML source in a syntax-highlighted,
+copy-to-clipboard box. It loads the snippet from the actual `.dart` asset via
+`rootBundle.loadString(...)`, optionally extracting the lines between
+`// #docregion <name>` and `// #enddocregion <name>` markers. Because the shown
+source is the same file that compiled into the running demo, the example code
+can never drift from what's executing.
+
+## Theme switcher & mobile preview
+
+Each live example page carries a toolbar (Raw / Elegant / Professional preset
+dropdown + accent swatches + a mobile-preview toggle). Choices are held in a
+shared controller (`lib/site/grid_theme_controller.dart`) so they persist while
+browsing, and the live grid re-keys to rebuild with the new `GridTheme`.
+Presets live in `lib/screens/_themes.dart`.

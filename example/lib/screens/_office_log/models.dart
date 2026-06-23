@@ -3,7 +3,8 @@ class Engineer {
   final String id;
   final String firstName;
   final String lastName;
-  final String role; // Backend / Frontend / QA / DevOps / Mobile / SRE / Tech Lead
+  final String
+  role; // Backend / Frontend / QA / DevOps / Mobile / SRE / Tech Lead
   final String employeeNumber;
 
   const Engineer({

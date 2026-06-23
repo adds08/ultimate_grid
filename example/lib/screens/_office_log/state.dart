@@ -112,8 +112,10 @@ class OfficeLogState extends ChangeNotifier {
   void setAbsent(String engineerId, bool absent) {
     final next = Map<String, AbsenceInfo>.from(_snap.absent);
     if (absent) {
-      next[engineerId] =
-          AbsenceInfo(absent: true, reason: next[engineerId]?.reason ?? '');
+      next[engineerId] = AbsenceInfo(
+        absent: true,
+        reason: next[engineerId]?.reason ?? '',
+      );
     } else {
       next.remove(engineerId);
     }
@@ -134,7 +136,10 @@ class OfficeLogState extends ChangeNotifier {
   void setCompGiven(String engineerId, bool given) {
     final next = Map<String, CompHours>.from(_snap.comp);
     if (given) {
-      next[engineerId] = CompHours(given: true, amount: next[engineerId]?.amount);
+      next[engineerId] = CompHours(
+        given: true,
+        amount: next[engineerId]?.amount,
+      );
     } else {
       next.remove(engineerId);
     }
@@ -161,12 +166,14 @@ class OfficeLogState extends ChangeNotifier {
     final absent = Map<String, AbsenceInfo>.from(_snap.absent)
       ..remove(engineerId);
     final comp = Map<String, CompHours>.from(_snap.comp)..remove(engineerId);
-    _commit(_snap.copyWith(
-      engineerIds: ids,
-      cells: cells,
-      absent: absent,
-      comp: comp,
-    ));
+    _commit(
+      _snap.copyWith(
+        engineerIds: ids,
+        cells: cells,
+        absent: absent,
+        comp: comp,
+      ),
+    );
   }
 
   void addColumn(String subTaskId) {

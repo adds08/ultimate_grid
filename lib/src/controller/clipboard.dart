@@ -81,6 +81,9 @@ abstract final class GridClipboard {
   static String _tsvEscape(String s) {
     // TSV: replace tabs / newlines so the row/col split stays sane.
     if (!s.contains('\t') && !s.contains('\n') && !s.contains('\r')) return s;
-    return s.replaceAll('\r\n', ' ').replaceAll('\n', ' ').replaceAll('\t', ' ');
+    return s
+        .replaceAll('\r\n', ' ')
+        .replaceAll('\n', ' ')
+        .replaceAll('\t', ' ');
   }
 }

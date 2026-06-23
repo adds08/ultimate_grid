@@ -46,14 +46,14 @@ class MapGridDataSource extends ChangeNotifier implements GridDataSource {
     required List<RowId> rowIds,
     required List<ColId> colIds,
     Map<RowId, Map<ColId, CellValue>>? cells,
-  })  : _rowIds = List<RowId>.of(rowIds),
-        _colIds = List<ColId>.of(colIds),
-        _cells = cells == null
-            ? <RowId, Map<ColId, CellValue>>{}
-            : {
-                for (final entry in cells.entries)
-                  entry.key: Map<ColId, CellValue>.of(entry.value),
-              };
+  }) : _rowIds = List<RowId>.of(rowIds),
+       _colIds = List<ColId>.of(colIds),
+       _cells = cells == null
+           ? <RowId, Map<ColId, CellValue>>{}
+           : {
+               for (final entry in cells.entries)
+                 entry.key: Map<ColId, CellValue>.of(entry.value),
+             };
 
   @override
   Iterable<RowId> get rowIds => _rowIds;

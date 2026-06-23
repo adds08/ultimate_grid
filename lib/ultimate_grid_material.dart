@@ -6,7 +6,12 @@
 library;
 
 export 'src/view/column_menu.dart'
-    show showUltimateColumnMenu, ColumnMenuAction, ColumnMenuState,
-    ColumnMenuBuilder, FilterDialogBuilder, getColumnMenuState,
-    applyColumnMenuAction;
+    show
+        showUltimateColumnMenu,
+        ColumnMenuAction,
+        ColumnMenuState,
+        ColumnMenuBuilder,
+        FilterDialogBuilder,
+        getColumnMenuState,
+        applyColumnMenuAction;
 export 'src/view/search_field.dart';

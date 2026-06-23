@@ -37,13 +37,13 @@ class AsyncGridDataSource extends ChangeNotifier implements GridDataSource {
     required List<RowId> rowIds,
     required List<ColId> colIds,
     required Future<AsyncPage> Function(int startRow, int endRowExclusive)
-        fetchRange,
+    fetchRange,
     this.pageSize = 50,
     CellValue loadingPlaceholder = const TextCell('…'),
-  })  : _rowIds = List<RowId>.of(rowIds),
-        _colIds = List<ColId>.of(colIds),
-        _fetchRange = fetchRange,
-        _loading = loadingPlaceholder;
+  }) : _rowIds = List<RowId>.of(rowIds),
+       _colIds = List<ColId>.of(colIds),
+       _fetchRange = fetchRange,
+       _loading = loadingPlaceholder;
 
   final List<RowId> _rowIds;
   final List<ColId> _colIds;
@@ -135,26 +135,28 @@ class AsyncGridDataSource extends ChangeNotifier implements GridDataSource {
     _inFlight.add(page);
     final start = page * pageSize;
     final end = (start + pageSize).clamp(0, _rowIds.length);
-    _fetchRange(start, end).then((result) {
-      // Source can be swapped / disposed mid-fetch (e.g. user toggles
-      // sync ↔ async). Drop the late result quietly instead of mutating
-      // a disposed ChangeNotifier — `notifyListeners()` asserts.
-      if (_disposed) return;
-      for (final rowId in result.rowIds) {
-        final inMap = result.cells[rowId];
-        if (inMap != null) {
-          _cells[rowId] = Map<ColId, CellValue>.of(inMap);
-        }
-      }
-      _loaded.add(page);
-      _inFlight.remove(page);
-      _bump();
-    }).catchError((Object _) {
-      if (_disposed) return;
-      // On error, allow a retry next read.
-      _inFlight.remove(page);
-      _bump();
-    });
+    _fetchRange(start, end)
+        .then((result) {
+          // Source can be swapped / disposed mid-fetch (e.g. user toggles
+          // sync ↔ async). Drop the late result quietly instead of mutating
+          // a disposed ChangeNotifier — `notifyListeners()` asserts.
+          if (_disposed) return;
+          for (final rowId in result.rowIds) {
+            final inMap = result.cells[rowId];
+            if (inMap != null) {
+              _cells[rowId] = Map<ColId, CellValue>.of(inMap);
+            }
+          }
+          _loaded.add(page);
+          _inFlight.remove(page);
+          _bump();
+        })
+        .catchError((Object _) {
+          if (_disposed) return;
+          // On error, allow a retry next read.
+          _inFlight.remove(page);
+          _bump();
+        });
   }
 
   void _bump() {

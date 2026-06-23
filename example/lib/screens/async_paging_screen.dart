@@ -71,7 +71,8 @@ class _AsyncPagingScreenState extends State<AsyncPagingScreen> {
           cells[_rowIds[i]] = {
             'sku': TextCell('SKU-${(i + 100000).toString().padLeft(7, '0')}'),
             'name': TextCell(
-                '$cat ${String.fromCharCode(65 + (i % 26))}${i % 100}'),
+              '$cat ${String.fromCharCode(65 + (i % 26))}${i % 100}',
+            ),
             'category': TextCell(cat),
             'stock': NumberCell(stock),
             'price': NumberCell(double.parse(price.toStringAsFixed(2))),
@@ -126,60 +127,63 @@ class _AsyncPagingScreenState extends State<AsyncPagingScreen> {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Wrap(
-                spacing: 12,
-                runSpacing: 6,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: [
-                  const Text('Simulated latency:',
-                      style: TextStyle(fontWeight: FontWeight.w600)),
-                  DropdownButton<int>(
-                    value: _latencyMs,
-                    isDense: true,
-                    items: const [
-                      DropdownMenuItem(value: 0, child: Text('0 ms')),
-                      DropdownMenuItem(value: 100, child: Text('100 ms')),
-                      DropdownMenuItem(value: 350, child: Text('350 ms')),
-                      DropdownMenuItem(value: 800, child: Text('800 ms')),
-                    ],
-                    onChanged: (v) {
-                      if (v == null) return;
-                      setState(() => _latencyMs = v);
-                    },
-                  ),
-                  Text('Pages fetched: $_pagesFetched',
-                      style: const TextStyle(fontSize: 12)),
-                  const Text('Page size: $_pageSize',
-                      style: TextStyle(fontSize: 12)),
-                ],
-              ),
-              const SizedBox(height: 8),
-              const HelpBanner(
-                text:
-                    '100k rows, fetched 50 at a time via AsyncGridDataSource. '
-                    'Scroll fast to see "Loading…" placeholders flash before '
-                    'pages resolve. Bump latency up to make it obvious.',
-              ),
-              const SizedBox(height: 8),
-              Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(color: const Color(0xFFE2E8F0)),
-                  ),
-                  child: UltimateTable(
-                    controller: _controller,
-                    theme: widget.theme,
-                    headerBuilder: (ctx, colId) =>
-                        HeaderLabel(controller: _controller, colId: colId),
-                  ),
-                ),
-              ),
-            ],
+    padding: const EdgeInsets.all(12),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Wrap(
+          spacing: 12,
+          runSpacing: 6,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            const Text(
+              'Simulated latency:',
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
+            DropdownButton<int>(
+              value: _latencyMs,
+              isDense: true,
+              items: const [
+                DropdownMenuItem(value: 0, child: Text('0 ms')),
+                DropdownMenuItem(value: 100, child: Text('100 ms')),
+                DropdownMenuItem(value: 350, child: Text('350 ms')),
+                DropdownMenuItem(value: 800, child: Text('800 ms')),
+              ],
+              onChanged: (v) {
+                if (v == null) return;
+                setState(() => _latencyMs = v);
+              },
+            ),
+            Text(
+              'Pages fetched: $_pagesFetched',
+              style: const TextStyle(fontSize: 12),
+            ),
+            const Text('Page size: $_pageSize', style: TextStyle(fontSize: 12)),
+          ],
+        ),
+        const SizedBox(height: 8),
+        const HelpBanner(
+          text:
+              '100k rows, fetched 50 at a time via AsyncGridDataSource. '
+              'Scroll fast to see "Loading…" placeholders flash before '
+              'pages resolve. Bump latency up to make it obvious.',
+        ),
+        const SizedBox(height: 8),
+        Expanded(
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(color: const Color(0xFFE2E8F0)),
+            ),
+            child: UltimateTable(
+              controller: _controller,
+              theme: widget.theme,
+              headerBuilder: (ctx, colId) =>
+                  HeaderLabel(controller: _controller, colId: colId),
+            ),
           ),
-        );
+        ),
+      ],
+    ),
+  );
 }

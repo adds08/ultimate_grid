@@ -11,7 +11,18 @@ import '../model/freeze.dart';
 import '../theme/grid_theme.dart';
 
 /// Column menu actions that can be performed on a column.
-enum ColumnMenuAction { sortAsc, sortDesc, sortOff, pinLeft, pinRight, pinNone, hide, fit, filter, clearFilter }
+enum ColumnMenuAction {
+  sortAsc,
+  sortDesc,
+  sortOff,
+  pinLeft,
+  pinRight,
+  pinNone,
+  hide,
+  fit,
+  filter,
+  clearFilter,
+}
 
 /// State snapshot of a column, passed to menu builders so they can
 /// render active indicators (sort direction, filter presence, pin state).
@@ -103,7 +114,9 @@ Future<void> applyColumnMenuAction(
       controller.hideColumn(colId);
     case ColumnMenuAction.fit:
       final spec = controller.schema.column(colId);
-      final style = spec?.kind == CellKind.number ? theme.bodyNumericStyle : theme.bodyTextStyle;
+      final style = spec?.kind == CellKind.number
+          ? theme.bodyNumericStyle
+          : theme.bodyTextStyle;
       controller.fitColumnToText(
         id: colId,
         measure: (text) {
@@ -153,8 +166,14 @@ Future<void> showUltimateColumnMenu({
       context: context,
       controller: controller,
       columnState: state,
-      onAction: (action) =>
-          applyColumnMenuAction(context, controller, colId, action, theme: theme, filterDialogBuilder: filterDialogBuilder),
+      onAction: (action) => applyColumnMenuAction(
+        context,
+        controller,
+        colId,
+        action,
+        theme: theme,
+        filterDialogBuilder: filterDialogBuilder,
+      ),
     );
     return;
   }
@@ -163,18 +182,31 @@ Future<void> showUltimateColumnMenu({
   if (!context.mounted) return;
   final result = await _showPaintedMenu(context, state);
   if (result == null || !context.mounted) return;
-  await applyColumnMenuAction(context, controller, colId, result, theme: theme, filterDialogBuilder: filterDialogBuilder);
+  await applyColumnMenuAction(
+    context,
+    controller,
+    colId,
+    result,
+    theme: theme,
+    filterDialogBuilder: filterDialogBuilder,
+  );
 }
 
 // ── Default painted overlay menu (no Material) ───────────────────────────────
 
-Future<ColumnMenuAction?> _showPaintedMenu(BuildContext context, ColumnMenuState state) async {
+Future<ColumnMenuAction?> _showPaintedMenu(
+  BuildContext context,
+  ColumnMenuState state,
+) async {
   final box = context.findRenderObject() as RenderBox?;
   if (box == null) return null;
 
   final overlay = Overlay.of(context);
   final overlayBox = overlay.context.findRenderObject() as RenderBox;
-  final position = box.localToGlobal(Offset(0, box.size.height), ancestor: overlayBox);
+  final position = box.localToGlobal(
+    Offset(0, box.size.height),
+    ancestor: overlayBox,
+  );
 
   final completer = _MenuCompleter<ColumnMenuAction>();
 
@@ -215,24 +247,51 @@ class _PaintedColumnMenu extends StatelessWidget {
   final ValueChanged<ColumnMenuAction> onSelect;
   final VoidCallback onDismiss;
 
-  const _PaintedColumnMenu({required this.position, required this.state, required this.onSelect, required this.onDismiss});
+  const _PaintedColumnMenu({
+    required this.position,
+    required this.state,
+    required this.onSelect,
+    required this.onDismiss,
+  });
 
   @override
   Widget build(BuildContext context) {
     final items = <_MenuItem>[
-      _MenuItem(ColumnMenuAction.sortAsc, '↑  Sort ascending', state.currentSortDirection == SortDirection.ascending),
-      _MenuItem(ColumnMenuAction.sortDesc, '↓  Sort descending', state.currentSortDirection == SortDirection.descending),
+      _MenuItem(
+        ColumnMenuAction.sortAsc,
+        '↑  Sort ascending',
+        state.currentSortDirection == SortDirection.ascending,
+      ),
+      _MenuItem(
+        ColumnMenuAction.sortDesc,
+        '↓  Sort descending',
+        state.currentSortDirection == SortDirection.descending,
+      ),
       const _MenuItem(ColumnMenuAction.sortOff, '✕  Clear sort', false),
       const _MenuItem.divider(),
-      _MenuItem(ColumnMenuAction.pinLeft, '◧  Pin to left', state.frozenSide == FrozenSide.start),
-      _MenuItem(ColumnMenuAction.pinRight, '◨  Pin to right', state.frozenSide == FrozenSide.end),
+      _MenuItem(
+        ColumnMenuAction.pinLeft,
+        '◧  Pin to left',
+        state.frozenSide == FrozenSide.start,
+      ),
+      _MenuItem(
+        ColumnMenuAction.pinRight,
+        '◨  Pin to right',
+        state.frozenSide == FrozenSide.end,
+      ),
       const _MenuItem(ColumnMenuAction.pinNone, '◻  Unpin', false),
       const _MenuItem.divider(),
       const _MenuItem(ColumnMenuAction.hide, '◌  Hide column', false),
       const _MenuItem(ColumnMenuAction.fit, '⇔  Resize to fit', false),
       const _MenuItem.divider(),
       _MenuItem(ColumnMenuAction.filter, '▽  Filter…', state.hasFilter),
-      if (state.hasFilter) const _MenuItem(ColumnMenuAction.clearFilter, '△  Clear filter', false, isDestructive: true),
+      if (state.hasFilter)
+        const _MenuItem(
+          ColumnMenuAction.clearFilter,
+          '△  Clear filter',
+          false,
+          isDestructive: true,
+        ),
     ];
 
     return GestureDetector(
@@ -258,9 +317,19 @@ class _MenuItem {
   final bool isDivider;
   final bool isDestructive;
 
-  const _MenuItem(this.action, this.label, this.active, {this.isDestructive = false}) : isDivider = false;
+  const _MenuItem(
+    this.action,
+    this.label,
+    this.active, {
+    this.isDestructive = false,
+  }) : isDivider = false;
 
-  const _MenuItem.divider() : action = null, label = '', active = false, isDivider = true, isDestructive = false;
+  const _MenuItem.divider()
+    : action = null,
+      label = '',
+      active = false,
+      isDivider = true,
+      isDestructive = false;
 }
 
 class _PaintedMenuPanel extends StatefulWidget {
@@ -282,7 +351,13 @@ class _PaintedMenuPanelState extends State<_PaintedMenuPanel> {
       decoration: BoxDecoration(
         color: const Color(0xFFFFFFFF),
         borderRadius: BorderRadius.circular(8),
-        boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 12, offset: Offset(0, 4))],
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x33000000),
+            blurRadius: 12,
+            offset: Offset(0, 4),
+          ),
+        ],
         border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
       ),
       child: ClipRRect(
@@ -306,13 +381,20 @@ class _PaintedMenuPanelState extends State<_PaintedMenuPanel> {
                         if (action != null) widget.onSelect(action);
                       },
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                        color: _hoveredIndex == i ? const Color(0xFFF1F5F9) : null,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                        color: _hoveredIndex == i
+                            ? const Color(0xFFF1F5F9)
+                            : null,
                         child: Text(
                           widget.items[i].label,
                           style: TextStyle(
                             fontSize: 13,
-                            fontWeight: widget.items[i].active ? FontWeight.w600 : FontWeight.w400,
+                            fontWeight: widget.items[i].active
+                                ? FontWeight.w600
+                                : FontWeight.w400,
                             color: widget.items[i].isDestructive
                                 ? const Color(0xFFB91C1C)
                                 : widget.items[i].active

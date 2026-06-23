@@ -25,12 +25,13 @@ class GridSchema {
   /// every `ColumnSpec.id` is unique and every `RowSpec.id` is unique
   /// within their respective lists.
   GridSchema({required this.columns, required this.rows})
-      : _colIndex = {for (final c in columns) c.id: c},
-        _rowIndex = {for (final r in rows) r.id: r} {
-    assert(_colIndex.length == columns.length,
-        'Duplicate column ids in GridSchema');
-    assert(_rowIndex.length == rows.length,
-        'Duplicate row ids in GridSchema');
+    : _colIndex = {for (final c in columns) c.id: c},
+      _rowIndex = {for (final r in rows) r.id: r} {
+    assert(
+      _colIndex.length == columns.length,
+      'Duplicate column ids in GridSchema',
+    );
+    assert(_rowIndex.length == rows.length, 'Duplicate row ids in GridSchema');
   }
 
   /// Looks up a [ColumnSpec] by id in O(1). Returns `null` if no column

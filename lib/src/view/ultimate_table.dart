@@ -71,7 +71,8 @@ class UltimateTable extends StatefulWidget {
     RowId rowId,
     ColId colId,
     CellValue value,
-  )? cellWidgetBuilder;
+  )?
+  cellWidgetBuilder;
 
   /// Optional header strip mounted above the top-frozen rows. The strip
   /// matches the body's 3-region freeze layout — left-frozen columns stay
@@ -282,10 +283,12 @@ class _UltimateTableState extends State<UltimateTable> {
         initial: initial,
         colId: hit.colId,
       );
-      widget.controller.setSelection(Selection(
-        ranges: [SelectionRange.cell(hit.rowIndex, hit.colIndex)],
-        focus: CellAddress(hit.rowId, hit.colId),
-      ));
+      widget.controller.setSelection(
+        Selection(
+          ranges: [SelectionRange.cell(hit.rowIndex, hit.colIndex)],
+          focus: CellAddress(hit.rowId, hit.colId),
+        ),
+      );
     });
     // Defer focus so the editor mounts first, then EditableText's caret
     // restore runs, then our select-all wins.
@@ -359,7 +362,8 @@ class _UltimateTableState extends State<UltimateTable> {
     final rows = ctl.rowLayout;
     final theme = widget.theme;
 
-    final hasNoRows = rows.middleViewIndices.isEmpty &&
+    final hasNoRows =
+        rows.middleViewIndices.isEmpty &&
         rows.topFrozen.isEmpty &&
         rows.bottomFrozen.isEmpty;
 
@@ -371,15 +375,18 @@ class _UltimateTableState extends State<UltimateTable> {
               height: widget.headerHeight,
               child: _buildHeaderOnly(ctl, cols, theme),
             ),
-            Expanded(
-              child: widget.emptyState ?? const SizedBox.shrink(),
-            ),
+            Expanded(child: widget.emptyState ?? const SizedBox.shrink()),
             if (widget.footerBuilder != null)
               Container(
                 height: widget.footerHeight,
                 decoration: BoxDecoration(
                   color: theme.footerBackground,
-                  border: Border(top: BorderSide(color: theme.gridLine, width: theme.gridLineWidth)),
+                  border: Border(
+                    top: BorderSide(
+                      color: theme.gridLine,
+                      width: theme.gridLineWidth,
+                    ),
+                  ),
                 ),
                 child: widget.footerBuilder!(context),
               ),
@@ -408,7 +415,12 @@ class _UltimateTableState extends State<UltimateTable> {
               height: widget.footerHeight,
               decoration: BoxDecoration(
                 color: theme.footerBackground,
-                border: Border(top: BorderSide(color: theme.gridLine, width: theme.gridLineWidth)),
+                border: Border(
+                  top: BorderSide(
+                    color: theme.gridLine,
+                    width: theme.gridLineWidth,
+                  ),
+                ),
               ),
               child: widget.footerBuilder!(context),
             ),
@@ -422,14 +434,18 @@ class _UltimateTableState extends State<UltimateTable> {
             const _CopySelectionIntent(),
         const SingleActivator(LogicalKeyboardKey.keyC, control: true):
             const _CopySelectionIntent(),
-        const SingleActivator(LogicalKeyboardKey.arrowLeft):
-            const _NavIntent(_NavDir.left),
-        const SingleActivator(LogicalKeyboardKey.arrowRight):
-            const _NavIntent(_NavDir.right),
-        const SingleActivator(LogicalKeyboardKey.arrowUp):
-            const _NavIntent(_NavDir.up),
-        const SingleActivator(LogicalKeyboardKey.arrowDown):
-            const _NavIntent(_NavDir.down),
+        const SingleActivator(LogicalKeyboardKey.arrowLeft): const _NavIntent(
+          _NavDir.left,
+        ),
+        const SingleActivator(LogicalKeyboardKey.arrowRight): const _NavIntent(
+          _NavDir.right,
+        ),
+        const SingleActivator(LogicalKeyboardKey.arrowUp): const _NavIntent(
+          _NavDir.up,
+        ),
+        const SingleActivator(LogicalKeyboardKey.arrowDown): const _NavIntent(
+          _NavDir.down,
+        ),
         const SingleActivator(LogicalKeyboardKey.arrowLeft, shift: true):
             const _NavIntent(_NavDir.left, extend: true),
         const SingleActivator(LogicalKeyboardKey.arrowRight, shift: true):
@@ -438,14 +454,18 @@ class _UltimateTableState extends State<UltimateTable> {
             const _NavIntent(_NavDir.up, extend: true),
         const SingleActivator(LogicalKeyboardKey.arrowDown, shift: true):
             const _NavIntent(_NavDir.down, extend: true),
-        const SingleActivator(LogicalKeyboardKey.home):
-            const _NavIntent(_NavDir.rowStart),
-        const SingleActivator(LogicalKeyboardKey.end):
-            const _NavIntent(_NavDir.rowEnd),
-        const SingleActivator(LogicalKeyboardKey.pageUp):
-            const _NavIntent(_NavDir.pageUp),
-        const SingleActivator(LogicalKeyboardKey.pageDown):
-            const _NavIntent(_NavDir.pageDown),
+        const SingleActivator(LogicalKeyboardKey.home): const _NavIntent(
+          _NavDir.rowStart,
+        ),
+        const SingleActivator(LogicalKeyboardKey.end): const _NavIntent(
+          _NavDir.rowEnd,
+        ),
+        const SingleActivator(LogicalKeyboardKey.pageUp): const _NavIntent(
+          _NavDir.pageUp,
+        ),
+        const SingleActivator(LogicalKeyboardKey.pageDown): const _NavIntent(
+          _NavDir.pageDown,
+        ),
       },
       child: Actions(
         actions: <Type, Action<Intent>>{
@@ -464,7 +484,8 @@ class _UltimateTableState extends State<UltimateTable> {
         },
         child: Semantics(
           label: 'Data grid',
-          value: '${rows.middleViewIndices.length} rows, '
+          value:
+              '${rows.middleViewIndices.length} rows, '
               '${cols.widths.length} columns',
           container: true,
           child: Focus(
@@ -540,8 +561,8 @@ class _UltimateTableState extends State<UltimateTable> {
       builder: (context, constraints) {
         final leftW = cols.leftFrozenWidth;
         final rightW = cols.rightFrozenWidth;
-        final vGutter = (widget.showVerticalScrollbar &&
-                widget.scrollbarGutter > 0)
+        final vGutter =
+            (widget.showVerticalScrollbar && widget.scrollbarGutter > 0)
             ? widget.scrollbarGutter
             : 0.0;
         return Container(
@@ -617,17 +638,19 @@ class _UltimateTableState extends State<UltimateTable> {
         final rightW = cols.rightFrozenWidth;
         // Reserve dedicated gutters for the scrollbars when configured —
         // the cells then don't share pixels with the scrollbar thumb.
-        final vGutter = (widget.showVerticalScrollbar &&
-                widget.scrollbarGutter > 0)
+        final vGutter =
+            (widget.showVerticalScrollbar && widget.scrollbarGutter > 0)
             ? widget.scrollbarGutter
             : 0.0;
-        final hGutter = (widget.showHorizontalScrollbar &&
-                widget.scrollbarGutter > 0)
+        final hGutter =
+            (widget.showHorizontalScrollbar && widget.scrollbarGutter > 0)
             ? widget.scrollbarGutter
             : 0.0;
         // Width / height available for the actual table content after the
         // gutters and footer are subtracted.
-        final footerH = widget.footerBuilder != null ? widget.footerHeight : 0.0;
+        final footerH = widget.footerBuilder != null
+            ? widget.footerHeight
+            : 0.0;
         final contentW = viewportWidth - vGutter;
         final contentH = (viewportHeight - hGutter).clamp(0.0, double.infinity);
         // Clamp the middle band to its natural width when the table is
@@ -636,15 +659,22 @@ class _UltimateTableState extends State<UltimateTable> {
         // between it and the last scrollable column. Match real-spreadsheet
         // behavior: frozen-right just sits next to the middle.
         final naturalMiddle = cols.middleWidth;
-        final availableMiddle = (contentW - leftW - rightW).clamp(0.0, double.infinity);
+        final availableMiddle = (contentW - leftW - rightW).clamp(
+          0.0,
+          double.infinity,
+        );
         final middleW = naturalMiddle < availableMiddle
             ? naturalMiddle
             : availableMiddle;
-        final double headerH =
-            widget.headerBuilder != null ? widget.headerHeight : 0.0;
+        final double headerH = widget.headerBuilder != null
+            ? widget.headerHeight
+            : 0.0;
         final topH = rows.topFrozenHeight;
         final bottomH = rows.bottomFrozenHeight;
-        final middleH = (contentH - headerH - topH - bottomH - footerH).clamp(0.0, double.infinity);
+        final middleH = (contentH - headerH - topH - bottomH - footerH).clamp(
+          0.0,
+          double.infinity,
+        );
         // Should the in-body scrollbars still show? Only if no gutter.
         final inlineVBar =
             widget.showVerticalScrollbar && widget.scrollbarGutter == 0;
@@ -653,272 +683,276 @@ class _UltimateTableState extends State<UltimateTable> {
 
         final tableContent = ClipRect(
           child: Container(
-          color: theme.background,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              if (widget.headerBuilder != null)
-                SizedBox(
-                  height: widget.headerHeight,
-                  child: _RegionTriple(
-                    leftWidth: leftW,
-                    middleWidth: middleW,
-                    rightWidth: rightW,
-                    background: theme.headerBackground,
-                    leftChild: _HeaderStrip(
-                      controller: ctl,
-                      theme: theme,
-                      cols: cols.leftFrozen,
-                      builder: widget.headerBuilder!,
-                      onTap: widget.onHeaderTap,
-                      resizable: false,
-                      minWidth: widget.headerMinWidth,
-                      maxWidth: widget.headerMaxWidth,
-                    ),
-                    middleChild: SingleChildScrollView(
-                      controller: _hHead,
-                      scrollDirection: Axis.horizontal,
-                      physics: const ClampingScrollPhysics(),
-                      child: SizedBox(
-                        width: cols.middleWidth,
-                        child: _HeaderStrip(
-                          controller: ctl,
-                          theme: theme,
-                          cols: cols.middle,
-                          builder: widget.headerBuilder!,
-                          onTap: widget.onHeaderTap,
-                          resizable: widget.resizableHeader,
-                          minWidth: widget.headerMinWidth,
-                          maxWidth: widget.headerMaxWidth,
-                        ),
+            color: theme.background,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (widget.headerBuilder != null)
+                  SizedBox(
+                    height: widget.headerHeight,
+                    child: _RegionTriple(
+                      leftWidth: leftW,
+                      middleWidth: middleW,
+                      rightWidth: rightW,
+                      background: theme.headerBackground,
+                      leftChild: _HeaderStrip(
+                        controller: ctl,
+                        theme: theme,
+                        cols: cols.leftFrozen,
+                        builder: widget.headerBuilder!,
+                        onTap: widget.onHeaderTap,
+                        resizable: false,
+                        minWidth: widget.headerMinWidth,
+                        maxWidth: widget.headerMaxWidth,
                       ),
-                    ),
-                    rightChild: _HeaderStrip(
-                      controller: ctl,
-                      theme: theme,
-                      cols: cols.rightFrozen,
-                      builder: widget.headerBuilder!,
-                      onTap: widget.onHeaderTap,
-                      resizable: false,
-                      minWidth: widget.headerMinWidth,
-                      maxWidth: widget.headerMaxWidth,
-                    ),
-                  ),
-                ),
-              if (topH > 0)
-                SizedBox(
-                  height: topH,
-                  child: _RegionTriple(
-                    leftWidth: leftW,
-                    middleWidth: middleW,
-                    rightWidth: rightW,
-                    background: theme.frozenStripBackground,
-                    leftChild: _FrozenRowsBand(
-                      controller: ctl,
-                      theme: theme,
-                      renderers: _renderers,
-                      rowIds: rows.topFrozen,
-                      heights: rows.topFrozenHeights,
-                      cols: cols.leftFrozen,
-                    ),
-                    middleChild: SingleChildScrollView(
-                      controller: _hTop,
-                      scrollDirection: Axis.horizontal,
-                      physics: const ClampingScrollPhysics(),
-                      child: SizedBox(
-                        width: cols.middleWidth,
-                        child: _FrozenRowsBand(
-                          controller: ctl,
-                          theme: theme,
-                          renderers: _renderers,
-                          rowIds: rows.topFrozen,
-                          heights: rows.topFrozenHeights,
-                          cols: cols.middle,
-                        ),
-                      ),
-                    ),
-                    rightChild: _FrozenRowsBand(
-                      controller: ctl,
-                      theme: theme,
-                      renderers: _renderers,
-                      rowIds: rows.topFrozen,
-                      heights: rows.topFrozenHeights,
-                      cols: cols.rightFrozen,
-                    ),
-                  ),
-                ),
-              SizedBox(
-                height: middleH > 0 ? middleH : 0,
-                child: _RegionTriple(
-                  leftWidth: leftW,
-                  middleWidth: middleW,
-                  rightWidth: rightW,
-                  background: theme.background,
-                  leftChild: _BodyRegion(
-                    controller: ctl,
-                    theme: theme,
-                    rowLayout: rows,
-                    columnIds: cols.leftFrozen,
-                    vController: _vLeft,
-                    width: leftW,
-                    paragraphCache: _paragraphCache,
-                    onTap: _onBodyTap,
-                    onDoubleTap: _onBodyDoubleTap,
-                    onDragStart: _onBodyDragStart,
-                    onDragUpdate: _onBodyDragUpdate,
-                    editing: _editing,
-                    editorCtrl: _editorCtrl,
-                    editorFocus: _editorFocus,
-                    widgetColumns: widget.widgetColumns,
-                    cellWidgetBuilder: widget.cellWidgetBuilder,
-                    onEditorSubmit: (String text) =>
-                        _commitOrCancelEditor(commit: true, text: text),
-                    onEditorCancel: () =>
-                        _commitOrCancelEditor(commit: false),
-                  ),
-                  middleChild: _maybeWrapH(
-                    enabled: inlineHBar && bottomH == 0,
-                    controller: _hMid,
-                    child: ScrollConfiguration(
-                      behavior: ScrollConfiguration.of(context)
-                          .copyWith(scrollbars: false),
-                      child: SingleChildScrollView(
-                        controller: _hMid,
+                      middleChild: SingleChildScrollView(
+                        controller: _hHead,
                         scrollDirection: Axis.horizontal,
                         physics: const ClampingScrollPhysics(),
                         child: SizedBox(
                           width: cols.middleWidth,
-                          child: _BodyRegion(
+                          child: _HeaderStrip(
                             controller: ctl,
                             theme: theme,
-                            rowLayout: rows,
-                            columnIds: cols.middle,
-                            vController: _vMid,
-                            width: cols.middleWidth,
-                            paragraphCache: _paragraphCache,
-                            onTap: _onBodyTap,
-                            onDoubleTap: _onBodyDoubleTap,
-                            onDragStart: _onBodyDragStart,
-                            onDragUpdate: _onBodyDragUpdate,
-                            editing: _editing,
-                            editorCtrl: _editorCtrl,
-                            editorFocus: _editorFocus,
-                            widgetColumns: widget.widgetColumns,
-                            cellWidgetBuilder: widget.cellWidgetBuilder,
-                            // Vertical scrollbar lives in the right-frozen
-                            // slice when there is one — that's the right
-                            // edge of the whole table. We only mount it
-                            // here as a fallback when there's no right-
-                            // frozen column.
-                            showVerticalScrollbar:
-                                inlineVBar && cols.rightFrozen.isEmpty,
-                            scrollbarPadding: widget.scrollbarPadding,
-                            onEditorSubmit: (String text) =>
-                                _commitOrCancelEditor(
-                                    commit: true, text: text),
-                            onEditorCancel: () =>
-                                _commitOrCancelEditor(commit: false),
+                            cols: cols.middle,
+                            builder: widget.headerBuilder!,
+                            onTap: widget.onHeaderTap,
+                            resizable: widget.resizableHeader,
+                            minWidth: widget.headerMinWidth,
+                            maxWidth: widget.headerMaxWidth,
                           ),
                         ),
                       ),
+                      rightChild: _HeaderStrip(
+                        controller: ctl,
+                        theme: theme,
+                        cols: cols.rightFrozen,
+                        builder: widget.headerBuilder!,
+                        onTap: widget.onHeaderTap,
+                        resizable: false,
+                        minWidth: widget.headerMinWidth,
+                        maxWidth: widget.headerMaxWidth,
+                      ),
                     ),
                   ),
-                  rightChild: _BodyRegion(
-                    controller: ctl,
-                    theme: theme,
-                    rowLayout: rows,
-                    columnIds: cols.rightFrozen,
-                    vController: _vRight,
-                    width: rightW,
-                    paragraphCache: _paragraphCache,
-                    onTap: _onBodyTap,
-                    onDoubleTap: _onBodyDoubleTap,
-                    onDragStart: _onBodyDragStart,
-                    onDragUpdate: _onBodyDragUpdate,
-                    editing: _editing,
-                    editorCtrl: _editorCtrl,
-                    editorFocus: _editorFocus,
-                    widgetColumns: widget.widgetColumns,
-                    cellWidgetBuilder: widget.cellWidgetBuilder,
-                    // The right-frozen slice is the natural home for the
-                    // inline scrollbar when the gutter is disabled.
-                    showVerticalScrollbar: inlineVBar,
-                    scrollbarPadding: widget.scrollbarPadding,
-                    onEditorSubmit: (String text) =>
-                        _commitOrCancelEditor(commit: true, text: text),
-                    onEditorCancel: () =>
-                        _commitOrCancelEditor(commit: false),
+                if (topH > 0)
+                  SizedBox(
+                    height: topH,
+                    child: _RegionTriple(
+                      leftWidth: leftW,
+                      middleWidth: middleW,
+                      rightWidth: rightW,
+                      background: theme.frozenStripBackground,
+                      leftChild: _FrozenRowsBand(
+                        controller: ctl,
+                        theme: theme,
+                        renderers: _renderers,
+                        rowIds: rows.topFrozen,
+                        heights: rows.topFrozenHeights,
+                        cols: cols.leftFrozen,
+                      ),
+                      middleChild: SingleChildScrollView(
+                        controller: _hTop,
+                        scrollDirection: Axis.horizontal,
+                        physics: const ClampingScrollPhysics(),
+                        child: SizedBox(
+                          width: cols.middleWidth,
+                          child: _FrozenRowsBand(
+                            controller: ctl,
+                            theme: theme,
+                            renderers: _renderers,
+                            rowIds: rows.topFrozen,
+                            heights: rows.topFrozenHeights,
+                            cols: cols.middle,
+                          ),
+                        ),
+                      ),
+                      rightChild: _FrozenRowsBand(
+                        controller: ctl,
+                        theme: theme,
+                        renderers: _renderers,
+                        rowIds: rows.topFrozen,
+                        heights: rows.topFrozenHeights,
+                        cols: cols.rightFrozen,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              if (bottomH > 0)
                 SizedBox(
-                  height: bottomH,
+                  height: middleH > 0 ? middleH : 0,
                   child: _RegionTriple(
                     leftWidth: leftW,
                     middleWidth: middleW,
                     rightWidth: rightW,
-                    background: theme.footerBackground,
-                    leftChild: _FrozenRowsBand(
+                    background: theme.background,
+                    leftChild: _BodyRegion(
                       controller: ctl,
                       theme: theme,
-                      renderers: _renderers,
-                      rowIds: rows.bottomFrozen,
-                      heights: rows.bottomFrozenHeights,
-                      cols: cols.leftFrozen,
+                      rowLayout: rows,
+                      columnIds: cols.leftFrozen,
+                      vController: _vLeft,
+                      width: leftW,
+                      paragraphCache: _paragraphCache,
+                      onTap: _onBodyTap,
+                      onDoubleTap: _onBodyDoubleTap,
+                      onDragStart: _onBodyDragStart,
+                      onDragUpdate: _onBodyDragUpdate,
+                      editing: _editing,
+                      editorCtrl: _editorCtrl,
+                      editorFocus: _editorFocus,
+                      widgetColumns: widget.widgetColumns,
+                      cellWidgetBuilder: widget.cellWidgetBuilder,
+                      onEditorSubmit: (String text) =>
+                          _commitOrCancelEditor(commit: true, text: text),
+                      onEditorCancel: () =>
+                          _commitOrCancelEditor(commit: false),
                     ),
                     middleChild: _maybeWrapH(
-                      enabled: inlineHBar,
-                      controller: _hBot,
+                      enabled: inlineHBar && bottomH == 0,
+                      controller: _hMid,
                       child: ScrollConfiguration(
-                        behavior: ScrollConfiguration.of(context)
-                            .copyWith(scrollbars: false),
+                        behavior: ScrollConfiguration.of(
+                          context,
+                        ).copyWith(scrollbars: false),
                         child: SingleChildScrollView(
-                          controller: _hBot,
+                          controller: _hMid,
                           scrollDirection: Axis.horizontal,
                           physics: const ClampingScrollPhysics(),
                           child: SizedBox(
                             width: cols.middleWidth,
-                            child: _FrozenRowsBand(
+                            child: _BodyRegion(
                               controller: ctl,
                               theme: theme,
-                              renderers: _renderers,
-                              rowIds: rows.bottomFrozen,
-                              heights: rows.bottomFrozenHeights,
-                              cols: cols.middle,
+                              rowLayout: rows,
+                              columnIds: cols.middle,
+                              vController: _vMid,
+                              width: cols.middleWidth,
+                              paragraphCache: _paragraphCache,
+                              onTap: _onBodyTap,
+                              onDoubleTap: _onBodyDoubleTap,
+                              onDragStart: _onBodyDragStart,
+                              onDragUpdate: _onBodyDragUpdate,
+                              editing: _editing,
+                              editorCtrl: _editorCtrl,
+                              editorFocus: _editorFocus,
+                              widgetColumns: widget.widgetColumns,
+                              cellWidgetBuilder: widget.cellWidgetBuilder,
+                              // Vertical scrollbar lives in the right-frozen
+                              // slice when there is one — that's the right
+                              // edge of the whole table. We only mount it
+                              // here as a fallback when there's no right-
+                              // frozen column.
+                              showVerticalScrollbar:
+                                  inlineVBar && cols.rightFrozen.isEmpty,
+                              scrollbarPadding: widget.scrollbarPadding,
+                              onEditorSubmit: (String text) =>
+                                  _commitOrCancelEditor(
+                                    commit: true,
+                                    text: text,
+                                  ),
+                              onEditorCancel: () =>
+                                  _commitOrCancelEditor(commit: false),
                             ),
                           ),
                         ),
                       ),
                     ),
-                    rightChild: _FrozenRowsBand(
+                    rightChild: _BodyRegion(
                       controller: ctl,
                       theme: theme,
-                      renderers: _renderers,
-                      rowIds: rows.bottomFrozen,
-                      heights: rows.bottomFrozenHeights,
-                      cols: cols.rightFrozen,
+                      rowLayout: rows,
+                      columnIds: cols.rightFrozen,
+                      vController: _vRight,
+                      width: rightW,
+                      paragraphCache: _paragraphCache,
+                      onTap: _onBodyTap,
+                      onDoubleTap: _onBodyDoubleTap,
+                      onDragStart: _onBodyDragStart,
+                      onDragUpdate: _onBodyDragUpdate,
+                      editing: _editing,
+                      editorCtrl: _editorCtrl,
+                      editorFocus: _editorFocus,
+                      widgetColumns: widget.widgetColumns,
+                      cellWidgetBuilder: widget.cellWidgetBuilder,
+                      // The right-frozen slice is the natural home for the
+                      // inline scrollbar when the gutter is disabled.
+                      showVerticalScrollbar: inlineVBar,
+                      scrollbarPadding: widget.scrollbarPadding,
+                      onEditorSubmit: (String text) =>
+                          _commitOrCancelEditor(commit: true, text: text),
+                      onEditorCancel: () =>
+                          _commitOrCancelEditor(commit: false),
                     ),
                   ),
                 ),
-            // ── Footer toolbar ──
-            if (widget.footerBuilder != null)
-              Container(
-                height: widget.footerHeight,
-                decoration: BoxDecoration(
-                  color: theme.footerBackground,
-                  border: Border(
-                    top: BorderSide(
-                      color: theme.gridLine,
-                      width: theme.gridLineWidth,
+                if (bottomH > 0)
+                  SizedBox(
+                    height: bottomH,
+                    child: _RegionTriple(
+                      leftWidth: leftW,
+                      middleWidth: middleW,
+                      rightWidth: rightW,
+                      background: theme.footerBackground,
+                      leftChild: _FrozenRowsBand(
+                        controller: ctl,
+                        theme: theme,
+                        renderers: _renderers,
+                        rowIds: rows.bottomFrozen,
+                        heights: rows.bottomFrozenHeights,
+                        cols: cols.leftFrozen,
+                      ),
+                      middleChild: _maybeWrapH(
+                        enabled: inlineHBar,
+                        controller: _hBot,
+                        child: ScrollConfiguration(
+                          behavior: ScrollConfiguration.of(
+                            context,
+                          ).copyWith(scrollbars: false),
+                          child: SingleChildScrollView(
+                            controller: _hBot,
+                            scrollDirection: Axis.horizontal,
+                            physics: const ClampingScrollPhysics(),
+                            child: SizedBox(
+                              width: cols.middleWidth,
+                              child: _FrozenRowsBand(
+                                controller: ctl,
+                                theme: theme,
+                                renderers: _renderers,
+                                rowIds: rows.bottomFrozen,
+                                heights: rows.bottomFrozenHeights,
+                                cols: cols.middle,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      rightChild: _FrozenRowsBand(
+                        controller: ctl,
+                        theme: theme,
+                        renderers: _renderers,
+                        rowIds: rows.bottomFrozen,
+                        heights: rows.bottomFrozenHeights,
+                        cols: cols.rightFrozen,
+                      ),
                     ),
                   ),
-                ),
-                child: widget.footerBuilder!(context),
-              ),
-            ],
+                // ── Footer toolbar ──
+                if (widget.footerBuilder != null)
+                  Container(
+                    height: widget.footerHeight,
+                    decoration: BoxDecoration(
+                      color: theme.footerBackground,
+                      border: Border(
+                        top: BorderSide(
+                          color: theme.gridLine,
+                          width: theme.gridLineWidth,
+                        ),
+                      ),
+                    ),
+                    child: widget.footerBuilder!(context),
+                  ),
+              ],
+            ),
           ),
-        ),
         );
         if (vGutter == 0 && hGutter == 0) return tableContent;
 
@@ -940,8 +974,9 @@ class _UltimateTableState extends State<UltimateTable> {
                     SizedBox(
                       height: middleH > 0 ? middleH : 0,
                       child: ScrollConfiguration(
-                        behavior: ScrollConfiguration.of(context)
-                            .copyWith(scrollbars: false),
+                        behavior: ScrollConfiguration.of(
+                          context,
+                        ).copyWith(scrollbars: false),
                         child: RawScrollbar(
                           controller: _vBar,
                           thumbVisibility: false,
@@ -977,8 +1012,9 @@ class _UltimateTableState extends State<UltimateTable> {
                     SizedBox(
                       width: availableMiddle > 0 ? availableMiddle : 0,
                       child: ScrollConfiguration(
-                        behavior: ScrollConfiguration.of(context)
-                            .copyWith(scrollbars: false),
+                        behavior: ScrollConfiguration.of(
+                          context,
+                        ).copyWith(scrollbars: false),
                         child: RawScrollbar(
                           controller: _hBar,
                           thumbVisibility: false,
@@ -1111,16 +1147,7 @@ class _CopySelectionIntent extends Intent {
   const _CopySelectionIntent();
 }
 
-enum _NavDir {
-  left,
-  right,
-  up,
-  down,
-  rowStart,
-  rowEnd,
-  pageUp,
-  pageDown,
-}
+enum _NavDir { left, right, up, down, rowStart, rowEnd, pageUp, pageDown }
 
 class _NavIntent extends Intent {
   final _NavDir dir;
@@ -1378,7 +1405,8 @@ class _BodyRegion extends StatefulWidget {
     RowId rowId,
     ColId colId,
     CellValue value,
-  )? cellWidgetBuilder;
+  )?
+  cellWidgetBuilder;
 
   /// Whether this slice wraps its vertical SingleChildScrollView in a
   /// RawScrollbar. The three body slices' vertical scroll positions are
@@ -1418,7 +1446,8 @@ class _BodyRegion extends StatefulWidget {
 
 class _BodyRegionState extends State<_BodyRegion> {
   bool get _editorInThisSlice =>
-      widget.editing != null && widget.columnIds.contains(widget.editing!.colId);
+      widget.editing != null &&
+      widget.columnIds.contains(widget.editing!.colId);
 
   /// Slice-local column indices for widget overlays, paired with their X
   /// position + width within the slice (avoids re-walking the slice every
@@ -1515,8 +1544,7 @@ class _BodyRegionState extends State<_BodyRegion> {
     final builder = widget.cellWidgetBuilder;
     if (builder == null) return const <Widget>[];
     final rows = widget.rowLayout;
-    final rowIdsAll =
-        widget.controller.source.rowIds.toList(growable: false);
+    final rowIdsAll = widget.controller.source.rowIds.toList(growable: false);
     final pipeline = widget.controller.pipelineResult;
     final out = <Widget>[];
     for (var i = 0; i < rows.middleViewIndices.length; i++) {
@@ -1528,27 +1556,35 @@ class _BodyRegionState extends State<_BodyRegion> {
       for (final wc in widgetCols) {
         final value = widget.controller.source.valueAt(rowId, wc.colId);
         final theme = widget.theme;
-        out.add(Positioned(
-          left: wc.left,
-          top: top,
-          width: wc.width,
-          height: height,
-          child: Container(
-            decoration: BoxDecoration(
-              border: Border(
-                right: theme.showVerticalGridLines
-                    ? BorderSide(color: theme.gridLine, width: theme.gridLineWidth)
-                    : BorderSide.none,
-                bottom: theme.showHorizontalGridLines
-                    ? BorderSide(color: theme.gridLine, width: theme.gridLineWidth)
-                    : BorderSide.none,
+        out.add(
+          Positioned(
+            left: wc.left,
+            top: top,
+            width: wc.width,
+            height: height,
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border(
+                  right: theme.showVerticalGridLines
+                      ? BorderSide(
+                          color: theme.gridLine,
+                          width: theme.gridLineWidth,
+                        )
+                      : BorderSide.none,
+                  bottom: theme.showHorizontalGridLines
+                      ? BorderSide(
+                          color: theme.gridLine,
+                          width: theme.gridLineWidth,
+                        )
+                      : BorderSide.none,
+                ),
+              ),
+              child: Builder(
+                builder: (ctx) => builder(ctx, rowId, wc.colId, value),
               ),
             ),
-            child: Builder(
-              builder: (ctx) => builder(ctx, rowId, wc.colId, value),
-            ),
           ),
-        ));
+        );
       }
     }
     return out;

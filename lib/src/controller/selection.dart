@@ -27,32 +27,34 @@ class SelectionRange {
   });
 
   const SelectionRange.cell(int row, int col)
-      : anchorRowIndex = row,
-        anchorColIndex = col,
-        extentRowIndex = row,
-        extentColIndex = col;
+    : anchorRowIndex = row,
+      anchorColIndex = col,
+      extentRowIndex = row,
+      extentColIndex = col;
 
   const SelectionRange.row(int row)
-      : anchorRowIndex = row,
-        anchorColIndex = allCols,
-        extentRowIndex = row,
-        extentColIndex = allCols;
+    : anchorRowIndex = row,
+      anchorColIndex = allCols,
+      extentRowIndex = row,
+      extentColIndex = allCols;
 
   const SelectionRange.column(int col)
-      : anchorRowIndex = allRows,
-        anchorColIndex = col,
-        extentRowIndex = allRows,
-        extentColIndex = col;
+    : anchorRowIndex = allRows,
+      anchorColIndex = col,
+      extentRowIndex = allRows,
+      extentColIndex = col;
 
   bool get isWholeRow => anchorColIndex == allCols && extentColIndex == allCols;
   bool get isWholeColumn =>
       anchorRowIndex == allRows && extentRowIndex == allRows;
 
   bool contains(int rowIndex, int colIndex) {
-    final rowOk = isWholeColumn ||
+    final rowOk =
+        isWholeColumn ||
         (rowIndex >= _min(anchorRowIndex, extentRowIndex) &&
             rowIndex <= _max(anchorRowIndex, extentRowIndex));
-    final colOk = isWholeRow ||
+    final colOk =
+        isWholeRow ||
         (colIndex >= _min(anchorColIndex, extentColIndex) &&
             colIndex <= _max(anchorColIndex, extentColIndex));
     return rowOk && colOk;
@@ -91,11 +93,11 @@ class SelectionRange {
 
   @override
   int get hashCode => Object.hash(
-        anchorRowIndex,
-        anchorColIndex,
-        extentRowIndex,
-        extentColIndex,
-      );
+    anchorRowIndex,
+    anchorColIndex,
+    extentRowIndex,
+    extentColIndex,
+  );
 }
 
 /// A flat list of [SelectionRange]s — Excel allows non-contiguous selections
@@ -123,10 +125,7 @@ class Selection {
   SelectionRange? get activeRange => ranges.isEmpty ? null : ranges.last;
 
   Selection copyWith({List<SelectionRange>? ranges, CellAddress? focus}) =>
-      Selection(
-        ranges: ranges ?? this.ranges,
-        focus: focus ?? this.focus,
-      );
+      Selection(ranges: ranges ?? this.ranges, focus: focus ?? this.focus);
 
   /// Replace the active range's extent — Excel shift-click / drag-extend
   /// behavior. Anchor stays put; only the extent moves.
@@ -148,8 +147,5 @@ class Selection {
 
   /// Push a new range on top — Excel cmd/ctrl-click behavior.
   Selection addRange(SelectionRange range, {CellAddress? focus}) =>
-      Selection(
-        ranges: [...ranges, range],
-        focus: focus ?? this.focus,
-      );
+      Selection(ranges: [...ranges, range], focus: focus ?? this.focus);
 }

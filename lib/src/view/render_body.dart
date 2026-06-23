@@ -102,7 +102,10 @@ class UltimateBody extends LeafRenderObjectWidget {
   }
 
   @override
-  void updateRenderObject(BuildContext context, RenderUltimateBody renderObject) {
+  void updateRenderObject(
+    BuildContext context,
+    RenderUltimateBody renderObject,
+  ) {
     renderObject
       ..controller = controller
       ..theme = theme
@@ -147,21 +150,21 @@ class RenderUltimateBody extends RenderBox {
     VoidCallback? onDragEnd,
     CellAddress? editingCell,
     Set<ColId> suppressedColumns = const <ColId>{},
-  })  : _controller = controller,
-        _theme = theme,
-        _rowLayout = rowLayout,
-        _columnLayout = columnLayout,
-        _columnIds = columnIds,
-        _vController = vController,
-        _width = width,
-        _paragraphCache = paragraphCache,
-        _onTap = onTap,
-        _onDoubleTap = onDoubleTap,
-        _onDragStart = onDragStart,
-        _onDragUpdate = onDragUpdate,
-        _onDragEnd = onDragEnd,
-        _editingCell = editingCell,
-        _suppressedColumns = suppressedColumns {
+  }) : _controller = controller,
+       _theme = theme,
+       _rowLayout = rowLayout,
+       _columnLayout = columnLayout,
+       _columnIds = columnIds,
+       _vController = vController,
+       _width = width,
+       _paragraphCache = paragraphCache,
+       _onTap = onTap,
+       _onDoubleTap = onDoubleTap,
+       _onDragStart = onDragStart,
+       _onDragUpdate = onDragUpdate,
+       _onDragEnd = onDragEnd,
+       _editingCell = editingCell,
+       _suppressedColumns = suppressedColumns {
     _tapRecognizer = TapGestureRecognizer()..onTapUp = _handleTapUp;
     _panRecognizer = PanGestureRecognizer()
       ..onStart = _handlePanStart
@@ -359,7 +362,8 @@ class RenderUltimateBody extends RenderBox {
     config
       ..isSemanticBoundary = true
       ..textDirection = TextDirection.ltr
-      ..label = 'Body region with '
+      ..label =
+          'Body region with '
           '${_rowLayout.middleViewIndices.length} rows and '
           '${_columnIds.length} columns';
   }
@@ -394,8 +398,7 @@ class RenderUltimateBody extends RenderBox {
     final rect = Rect.fromLTWH(colLeft, rowTop, colWidth, rowHeight);
     final viewIdx = _rowLayout.middleViewIndices[rowSlot];
     final origRowIdx = _controller.pipelineResult.viewRowIndices[viewIdx];
-    final rowId =
-        _controller.source.rowIds.toList(growable: false)[origRowIdx];
+    final rowId = _controller.source.rowIds.toList(growable: false)[origRowIdx];
     final colId = _columnIds[colSlot];
     return BodyCellHit(
       rowIndex: viewIdx,
@@ -420,7 +423,8 @@ class RenderUltimateBody extends RenderBox {
     final now = DateTime.now();
     final lastTime = _lastTapTime;
     final lastPos = _lastTapPos;
-    final isDouble = lastTime != null &&
+    final isDouble =
+        lastTime != null &&
         lastPos != null &&
         now.difference(lastTime).inMilliseconds < 300 &&
         (details.localPosition - lastPos).distance < 20;
@@ -537,15 +541,19 @@ class RenderUltimateBody extends RenderBox {
         final anchor = mergeIndex.anchorAt(viewIdx, flatColIdx);
         if (anchor != null) {
           // Sum extra widths within this slice.
-          for (var dc = 1;
-              dc < anchor.colSpan && (cs + dc) < _columnIds.length;
-              dc++) {
+          for (
+            var dc = 1;
+            dc < anchor.colSpan && (cs + dc) < _columnIds.length;
+            dc++
+          ) {
             colW += _sliceWidths[cs + dc];
           }
           // Sum extra heights below in the same view (frozen rows excluded).
-          for (var dr = 1;
-              dr < anchor.rowSpan && (rs + dr) < _rowLayout.middleHeights.length;
-              dr++) {
+          for (
+            var dr = 1;
+            dr < anchor.rowSpan && (rs + dr) < _rowLayout.middleHeights.length;
+            dr++
+          ) {
             rowHActive += _rowLayout.middleHeights[rs + dr];
           }
         }
@@ -556,10 +564,12 @@ class RenderUltimateBody extends RenderBox {
           rowHActive,
         );
         final isSelected = selection.contains(viewIdx, flatColIdx);
-        final isFocused = selection.focus != null &&
+        final isFocused =
+            selection.focus != null &&
             selection.focus!.row == rowId &&
             selection.focus!.col == colId;
-        final isEditing = _editingCell != null &&
+        final isEditing =
+            _editingCell != null &&
             _editingCell!.row == rowId &&
             _editingCell!.col == colId;
 
@@ -597,10 +607,7 @@ class RenderUltimateBody extends RenderBox {
         }
 
         if (isFocused && !isEditing) {
-          canvas.drawRect(
-            cellRect.deflate(1.0),
-            _focusStrokePaint,
-          );
+          canvas.drawRect(cellRect.deflate(1.0), _focusStrokePaint);
         }
       }
     }
@@ -648,10 +655,7 @@ class RenderUltimateBody extends RenderBox {
           align: TextAlign.center,
           maxWidth: boxSize,
         );
-        painter.paint(
-          canvas,
-          Offset(box.left, cy - painter.height / 2),
-        );
+        painter.paint(canvas, Offset(box.left, cy - painter.height / 2));
       }
       return;
     }
@@ -664,8 +668,9 @@ class RenderUltimateBody extends RenderBox {
     final innerH = rect.height - pad.top - pad.bottom;
     if (innerW <= 0 || innerH <= 0) return;
     final align = kind == CellKind.number ? TextAlign.right : TextAlign.left;
-    final style =
-        kind == CellKind.number ? _theme.bodyNumericStyle : _theme.bodyTextStyle;
+    final style = kind == CellKind.number
+        ? _theme.bodyNumericStyle
+        : _theme.bodyTextStyle;
     final painter = _paragraphCache.acquire(
       text: text,
       style: style,

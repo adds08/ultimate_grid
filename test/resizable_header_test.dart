@@ -38,9 +38,7 @@ void main() {
 
   testWidgets('UltimateResizableHeader tap fires onTapColumn', (tester) async {
     final schema = GridSchema(
-      columns: const [
-        ColumnSpec(id: 'a', header: 'A', defaultWidth: 100),
-      ],
+      columns: const [ColumnSpec(id: 'a', header: 'A', defaultWidth: 100)],
       rows: const [RowSpec(id: 'r1')],
     );
     final src = MapGridDataSource(rowIds: ['r1'], colIds: ['a']);

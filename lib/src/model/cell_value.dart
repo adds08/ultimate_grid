@@ -82,8 +82,7 @@ final class FormulaCell extends CellValue {
   const FormulaCell(this.source, {this.cached});
   @override
   Object? get raw => cached?.raw ?? source;
-  FormulaCell withCached(CellValue? next) =>
-      FormulaCell(source, cached: next);
+  FormulaCell withCached(CellValue? next) => FormulaCell(source, cached: next);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||

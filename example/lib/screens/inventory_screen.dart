@@ -106,32 +106,32 @@ class _InventoryScreenState extends State<InventoryScreen> {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const HelpBanner(
-                text:
-                    'Minimal shape — schema + MapGridDataSource + '
-                    'GridController + UltimateTable. SKU and Margin % are '
-                    'frozen to opposite edges.',
-              ),
-              const SizedBox(height: 8),
-              Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(color: const Color(0xFFE2E8F0)),
-                  ),
-                  child: UltimateTable(
-                    controller: _controller,
-                    theme: widget.theme,
-                    headerBuilder: (ctx, colId) =>
-                        HeaderLabel(controller: _controller, colId: colId),
-                  ),
-                ),
-              ),
-          ],
+    padding: const EdgeInsets.all(12),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const HelpBanner(
+          text:
+              'Minimal shape — schema + MapGridDataSource + '
+              'GridController + UltimateTable. SKU and Margin % are '
+              'frozen to opposite edges.',
         ),
-      );
+        const SizedBox(height: 8),
+        Expanded(
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(color: const Color(0xFFE2E8F0)),
+            ),
+            child: UltimateTable(
+              controller: _controller,
+              theme: widget.theme,
+              headerBuilder: (ctx, colId) =>
+                  HeaderLabel(controller: _controller, colId: colId),
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
 }

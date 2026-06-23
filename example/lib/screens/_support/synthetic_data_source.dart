@@ -10,17 +10,16 @@ import 'package:ultimate_grid/ultimate_grid.dart';
 /// [generator] to produce the value.
 ///
 /// Used by the stress-test example to show 5 M rows × 10 columns.
-class SyntheticGridDataSource extends ChangeNotifier
-    implements GridDataSource {
+class SyntheticGridDataSource extends ChangeNotifier implements GridDataSource {
   SyntheticGridDataSource({
     required int rowCount,
     required List<ColId> colIds,
     required CellValue Function(int rowIndex, ColId colId) generator,
     String rowIdPrefix = 'r',
-  })  : _rowIds = List<RowId>.generate(rowCount, (i) => '$rowIdPrefix$i'),
-        _colIds = List<ColId>.of(colIds),
-        _generator = generator,
-        _prefixLen = rowIdPrefix.length;
+  }) : _rowIds = List<RowId>.generate(rowCount, (i) => '$rowIdPrefix$i'),
+       _colIds = List<ColId>.of(colIds),
+       _generator = generator,
+       _prefixLen = rowIdPrefix.length;
 
   final List<RowId> _rowIds;
   final List<ColId> _colIds;

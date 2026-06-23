@@ -9,14 +9,19 @@ void main() {
     (tester) async {
       final schema = GridSchema(
         columns: [
-          const ColumnSpec(id: 'a', header: 'A',
-              defaultFrozen: FrozenSide.start),
+          const ColumnSpec(
+            id: 'a',
+            header: 'A',
+            defaultFrozen: FrozenSide.start,
+          ),
           for (var i = 0; i < 10; i++)
             ColumnSpec(id: 'c$i', header: 'C$i', defaultWidth: 130),
-          const ColumnSpec(id: 'z', header: 'Z',
-              defaultFrozen: FrozenSide.end),
+          const ColumnSpec(id: 'z', header: 'Z', defaultFrozen: FrozenSide.end),
         ],
-        rows: const [RowSpec(id: 'r0'), RowSpec(id: 'r1')],
+        rows: const [
+          RowSpec(id: 'r0'),
+          RowSpec(id: 'r1'),
+        ],
       );
       final src = MapGridDataSource(
         rowIds: ['r0', 'r1'],
@@ -35,9 +40,8 @@ void main() {
               height: 300,
               child: UltimateTable(
                 controller: controller,
-                headerBuilder: (ctx, colId) => Text(
-                  controller.schema.column(colId)?.header ?? colId,
-                ),
+                headerBuilder: (ctx, colId) =>
+                    Text(controller.schema.column(colId)?.header ?? colId),
               ),
             ),
           ),
@@ -75,9 +79,8 @@ void main() {
               height: 300,
               child: UltimateTable(
                 controller: controller,
-                headerBuilder: (ctx, colId) => Text(
-                  controller.schema.column(colId)?.header ?? colId,
-                ),
+                headerBuilder: (ctx, colId) =>
+                    Text(controller.schema.column(colId)?.header ?? colId),
               ),
             ),
           ),

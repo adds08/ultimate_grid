@@ -7,12 +7,13 @@ GridController _build() {
       ColumnSpec(id: 'a', header: 'A'),
       ColumnSpec(id: 'b', header: 'B', kind: CellKind.number),
     ],
-    rows: const [RowSpec(id: 'r1'), RowSpec(id: 'r2'), RowSpec(id: 'r3')],
+    rows: const [
+      RowSpec(id: 'r1'),
+      RowSpec(id: 'r2'),
+      RowSpec(id: 'r3'),
+    ],
   );
-  final src = MapGridDataSource(
-    rowIds: ['r1', 'r2', 'r3'],
-    colIds: ['a', 'b'],
-  );
+  final src = MapGridDataSource(rowIds: ['r1', 'r2', 'r3'], colIds: ['a', 'b']);
   src.setValue('r1', 'a', const TextCell('apple'));
   src.setValue('r1', 'b', const NumberCell(3));
   src.setValue('r2', 'a', const TextCell('banana'));

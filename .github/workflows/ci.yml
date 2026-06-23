@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  analyze-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Flutter version
+        run: flutter --version
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      # Advisory only: the published tree predates a Dart formatter version
+      # bump, so a hard gate would fail on day one without a mass reformat.
+      # Flip to a blocking check after a deliberate `dart format .` pass.
+      - name: Check formatting (advisory)
+        run: dart format --output=none --set-exit-if-changed .
+        continue-on-error: true
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Run tests
+        run: flutter test
+
+      - name: Publish dry-run
+        run: dart pub publish --dry-run
+
+  build-example-web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Build example for web
+        working-directory: example
+        run: |
+          flutter pub get
+          dart run tool/sync_assets.dart
+          flutter build web --no-wasm-dry-run

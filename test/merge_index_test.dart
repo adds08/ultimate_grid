@@ -64,19 +64,24 @@ void main() {
           ColumnSpec(id: 'a', header: 'A'),
           ColumnSpec(id: 'b', header: 'B'),
         ],
-        rows: const [RowSpec(id: 'r1'), RowSpec(id: 'r2')],
+        rows: const [
+          RowSpec(id: 'r1'),
+          RowSpec(id: 'r2'),
+        ],
       );
       final src = MapGridDataSource(rowIds: ['r1', 'r2'], colIds: ['a', 'b']);
       final c = GridController(schema: schema, source: src);
 
       expect(c.mergeIndex.isEmpty, isTrue);
 
-      src.addMerge(const MergeRange(
-        anchorRow: 'r1',
-        anchorCol: 'a',
-        rowSpan: 2,
-        colSpan: 2,
-      ));
+      src.addMerge(
+        const MergeRange(
+          anchorRow: 'r1',
+          anchorCol: 'a',
+          rowSpan: 2,
+          colSpan: 2,
+        ),
+      );
       expect(c.mergeIndex.anchorAt(0, 0), isNotNull);
       expect(c.mergeIndex.isOccluded(1, 1), isTrue);
     });

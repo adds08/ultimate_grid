@@ -22,8 +22,8 @@ class MergeRange {
     required this.anchorCol,
     required this.rowSpan,
     required this.colSpan,
-  })  : assert(rowSpan >= 1, 'rowSpan must be >= 1'),
-        assert(colSpan >= 1, 'colSpan must be >= 1');
+  }) : assert(rowSpan >= 1, 'rowSpan must be >= 1'),
+       assert(colSpan >= 1, 'colSpan must be >= 1');
 
   @override
   bool operator ==(Object other) =>

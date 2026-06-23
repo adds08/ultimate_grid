@@ -55,8 +55,11 @@ void main() {
     test('source mutation rebuilds derived state once', () {
       final c = _build();
       final r0 = c.revision;
-      (c.source as MapGridDataSource)
-          .setValue('r1', 'name', const TextCell('apple'));
+      (c.source as MapGridDataSource).setValue(
+        'r1',
+        'name',
+        const TextCell('apple'),
+      );
       expect(c.revision, greaterThan(r0));
     });
 
@@ -64,9 +67,7 @@ void main() {
       final c = _build();
       var notified = 0;
       c.addListener(() => notified++);
-      c.setSelection(const Selection(
-        ranges: [SelectionRange.cell(0, 0)],
-      ));
+      c.setSelection(const Selection(ranges: [SelectionRange.cell(0, 0)]));
       expect(notified, 1);
       expect(c.selection.contains(0, 0), isTrue);
       expect(c.selection.contains(1, 1), isFalse);

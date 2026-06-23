@@ -60,29 +60,29 @@ void main() {
     expect(controller.selection.activeRange!.extentColIndex, 2);
   });
 
-  testWidgets(
-    'shift+arrow extends the active range instead of moving it',
-    (tester) async {
-      final controller = _build();
-      controller.selectCell(0, 0);
-      await _mount(tester, controller);
+  testWidgets('shift+arrow extends the active range instead of moving it', (
+    tester,
+  ) async {
+    final controller = _build();
+    controller.selectCell(0, 0);
+    await _mount(tester, controller);
 
-      await tester.sendKeyDownEvent(LogicalKeyboardKey.shiftLeft);
-      await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
-      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
-      await tester.sendKeyUpEvent(LogicalKeyboardKey.shiftLeft);
-      await tester.pump();
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.shiftLeft);
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.shiftLeft);
+    await tester.pump();
 
-      final r = controller.selection.activeRange!;
-      expect(r.anchorRowIndex, 0);
-      expect(r.anchorColIndex, 0);
-      expect(r.extentRowIndex, 1);
-      expect(r.extentColIndex, 1);
-    },
-  );
+    final r = controller.selection.activeRange!;
+    expect(r.anchorRowIndex, 0);
+    expect(r.anchorColIndex, 0);
+    expect(r.extentRowIndex, 1);
+    expect(r.extentColIndex, 1);
+  });
 
-  testWidgets('pageDown / pageUp move the extent vertically by more than 1',
-      (tester) async {
+  testWidgets('pageDown / pageUp move the extent vertically by more than 1', (
+    tester,
+  ) async {
     final controller = _build(rows: 100, cols: 3);
     controller.selectCell(0, 0);
     await _mount(tester, controller);
@@ -90,18 +90,25 @@ void main() {
     await tester.sendKeyEvent(LogicalKeyboardKey.pageDown);
     await tester.pump();
     final afterDown = controller.selection.activeRange!.extentRowIndex;
-    expect(afterDown, greaterThan(1),
-        reason: 'pageDown should move more than a single row');
+    expect(
+      afterDown,
+      greaterThan(1),
+      reason: 'pageDown should move more than a single row',
+    );
 
     await tester.sendKeyEvent(LogicalKeyboardKey.pageUp);
     await tester.pump();
     final afterUp = controller.selection.activeRange!.extentRowIndex;
-    expect(afterUp, lessThan(afterDown),
-        reason: 'pageUp should move back upward');
+    expect(
+      afterUp,
+      lessThan(afterDown),
+      reason: 'pageUp should move back upward',
+    );
   });
 
-  testWidgets('escape inside the in-cell editor closes it without committing',
-      (tester) async {
+  testWidgets('escape inside the in-cell editor closes it without committing', (
+    tester,
+  ) async {
     final schema = GridSchema(
       columns: const [
         ColumnSpec(id: 'name', header: 'Name', defaultWidth: 200),
@@ -140,14 +147,21 @@ void main() {
     await tester.sendKeyEvent(LogicalKeyboardKey.escape);
     await tester.pumpAndSettle();
 
-    expect(find.byType(UltimateCellEditor), findsNothing,
-        reason: 'Escape should close the editor');
-    expect(controller.source.valueAt('r1', 'name'), const TextCell('Apple'),
-        reason: 'Escape should not commit the edited text');
+    expect(
+      find.byType(UltimateCellEditor),
+      findsNothing,
+      reason: 'Escape should close the editor',
+    );
+    expect(
+      controller.source.valueAt('r1', 'name'),
+      const TextCell('Apple'),
+      reason: 'Escape should not commit the edited text',
+    );
   });
 
-  testWidgets('enter inside the in-cell editor commits the new value',
-      (tester) async {
+  testWidgets('enter inside the in-cell editor commits the new value', (
+    tester,
+  ) async {
     final schema = GridSchema(
       columns: const [
         ColumnSpec(id: 'name', header: 'Name', defaultWidth: 200),
@@ -185,20 +199,30 @@ void main() {
     await tester.sendKeyEvent(LogicalKeyboardKey.enter);
     await tester.pumpAndSettle();
 
-    expect(find.byType(UltimateCellEditor), findsNothing,
-        reason: 'Enter should close the editor');
-    expect(controller.source.valueAt('r1', 'name'), const TextCell('Cherry'),
-        reason: 'Enter should commit the edited text');
+    expect(
+      find.byType(UltimateCellEditor),
+      findsNothing,
+      reason: 'Enter should close the editor',
+    );
+    expect(
+      controller.source.valueAt('r1', 'name'),
+      const TextCell('Cherry'),
+      reason: 'Enter should commit the edited text',
+    );
   });
 
-  testWidgets('cmd+C copies the active selection to the system clipboard',
-      (tester) async {
+  testWidgets('cmd+C copies the active selection to the system clipboard', (
+    tester,
+  ) async {
     final schema = GridSchema(
       columns: const [
         ColumnSpec(id: 'a', header: 'A'),
         ColumnSpec(id: 'b', header: 'B'),
       ],
-      rows: const [RowSpec(id: 'r1'), RowSpec(id: 'r2')],
+      rows: const [
+        RowSpec(id: 'r1'),
+        RowSpec(id: 'r2'),
+      ],
     );
     final src = MapGridDataSource(rowIds: ['r1', 'r2'], colIds: ['a', 'b']);
     src.setValue('r1', 'a', const TextCell('hello'));
@@ -212,11 +236,11 @@ void main() {
     String? captured;
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(SystemChannels.platform, (call) async {
-      if (call.method == 'Clipboard.setData') {
-        captured = (call.arguments as Map)['text'] as String?;
-      }
-      return null;
-    });
+          if (call.method == 'Clipboard.setData') {
+            captured = (call.arguments as Map)['text'] as String?;
+          }
+          return null;
+        });
     addTearDown(() {
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(SystemChannels.platform, null);

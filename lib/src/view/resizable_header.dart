@@ -113,35 +113,36 @@ class _UltimateResizableHeaderState extends State<UltimateResizableHeader> {
           Positioned.fill(
             child: Builder(
               builder: (cellCtx) => GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () => widget.onTapColumn?.call(cellCtx, colId),
-              onLongPress: () =>
-                  widget.onLongPressColumn?.call(cellCtx, colId),
-              child: Container(
-                alignment: Alignment.centerLeft,
-                padding: theme.cellPadding,
-                decoration: BoxDecoration(
-                  border: Border(
-                    right: BorderSide(
-                      color: theme.gridLine,
-                      width: theme.gridLineWidth,
-                    ),
-                    bottom: BorderSide(
-                      color: theme.thickLine,
-                      width: theme.thickLineWidth,
+                behavior: HitTestBehavior.opaque,
+                onTap: () => widget.onTapColumn?.call(cellCtx, colId),
+                onLongPress: () =>
+                    widget.onLongPressColumn?.call(cellCtx, colId),
+                child: Container(
+                  alignment: Alignment.centerLeft,
+                  padding: theme.cellPadding,
+                  decoration: BoxDecoration(
+                    border: Border(
+                      right: BorderSide(
+                        color: theme.gridLine,
+                        width: theme.gridLineWidth,
+                      ),
+                      bottom: BorderSide(
+                        color: theme.thickLine,
+                        width: theme.thickLineWidth,
+                      ),
                     ),
                   ),
+                  child: widget.headerBuilder != null
+                      ? widget.headerBuilder!(context, colId)
+                      : Text(
+                          widget.controller.schema.column(colId)?.header ??
+                              colId,
+                          style: theme.headerTextStyle,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
                 ),
-                child: widget.headerBuilder != null
-                    ? widget.headerBuilder!(context, colId)
-                    : Text(
-                        widget.controller.schema.column(colId)?.header ?? colId,
-                        style: theme.headerTextStyle,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                      ),
               ),
-            ),
             ),
           ),
           // Frozen columns aren't resizable — their width is a UX promise
@@ -226,9 +227,7 @@ class _UltimateResizableHeaderState extends State<UltimateResizableHeader> {
               body,
               Positioned.fill(
                 child: IgnorePointer(
-                  child: Container(
-                    color: theme.selectionFill,
-                  ),
+                  child: Container(color: theme.selectionFill),
                 ),
               ),
             ],

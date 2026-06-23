@@ -59,11 +59,13 @@ void main() {
       search.stop();
 
       // ignore: avoid_print
-      print('[bench] controller-build=${ctl.elapsedMilliseconds}ms  '
-          'sort=${sw.elapsedMilliseconds}ms  '
-          'filter=${ft.elapsedMilliseconds}ms  '
-          'search=${search.elapsedMilliseconds}ms  '
-          '(viewRows=${controller.pipelineResult.viewRowIndices.length})');
+      print(
+        '[bench] controller-build=${ctl.elapsedMilliseconds}ms  '
+        'sort=${sw.elapsedMilliseconds}ms  '
+        'filter=${ft.elapsedMilliseconds}ms  '
+        'search=${search.elapsedMilliseconds}ms  '
+        '(viewRows=${controller.pipelineResult.viewRowIndices.length})',
+      );
 
       // Soft ceilings: should be well under these on a modern dev box.
       // CI safety margin x5 — adjust if these become flaky.
@@ -89,8 +91,10 @@ void main() {
       }
       sw.stop();
       // ignore: avoid_print
-      print('[bench] ParagraphCache 1000 lookups (100 distinct) '
-          '= ${sw.elapsedMilliseconds}ms; size=${cache.length}');
+      print(
+        '[bench] ParagraphCache 1000 lookups (100 distinct) '
+        '= ${sw.elapsedMilliseconds}ms; size=${cache.length}',
+      );
       expect(cache.length, distinct);
       expect(sw.elapsedMilliseconds, lessThan(2000));
     });

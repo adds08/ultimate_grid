@@ -9,6 +9,14 @@
 # packages, and plugins designed to encourage good coding practices.
 include: package:flutter_lints/flutter.yaml
 
+analyzer:
+  exclude:
+    # Display snippets shown verbatim in CodePanels and source snapshots used
+    # only as runtime assets — not part of the compiled app.
+    - assets/**
+    # Build output copies assets back in; never analyze it.
+    - build/**
+
 linter:
   # The lint rules applied to this project can be customized in the
   # section below to disable rules from the `package:flutter_lints/flutter.yaml`

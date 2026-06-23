@@ -36,9 +36,7 @@ void main() {
       final r = ViewPipeline.run(
         source: src,
         sortKeys: const [],
-        filters: {
-          'qty': (v) => v is NumberCell && v.value >= 2,
-        },
+        filters: {'qty': (v) => v is NumberCell && v.value >= 2},
         query: '',
       );
       expect(r.viewRowIndices, [0, 2, 3]); // r1 qty=3, r3 qty=2, r4 qty=4
@@ -87,9 +85,7 @@ void main() {
       final r = ViewPipeline.run(
         source: src,
         sortKeys: const [SortKey('qty', SortDirection.ascending)],
-        filters: {
-          'qty': (v) => v is NumberCell && v.value >= 2,
-        },
+        filters: {'qty': (v) => v is NumberCell && v.value >= 2},
         query: '',
       );
       expect(r.viewRowIndices, [2, 0, 3]); // qty 2, 3, 4

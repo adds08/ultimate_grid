@@ -16,8 +16,11 @@ class HelpBanner extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(Icons.tips_and_updates,
-              size: 14, color: Color(0xFFEA580C)),
+          const Icon(
+            Icons.tips_and_updates,
+            size: 14,
+            color: Color(0xFFEA580C),
+          ),
           const SizedBox(width: 6),
           Expanded(child: Text(text, style: const TextStyle(fontSize: 12))),
         ],
@@ -29,17 +32,14 @@ class HelpBanner extends StatelessWidget {
 class HeaderLabel extends StatelessWidget {
   final GridController controller;
   final ColId colId;
-  const HeaderLabel({
-    super.key,
-    required this.controller,
-    required this.colId,
-  });
+  const HeaderLabel({super.key, required this.controller, required this.colId});
 
   @override
   Widget build(BuildContext context) {
     final spec = controller.schema.column(colId);
-    final sortKey =
-        controller.sortKeys.where((k) => k.col == colId).firstOrNull;
+    final sortKey = controller.sortKeys
+        .where((k) => k.col == colId)
+        .firstOrNull;
     final hasFilter = controller.filters.containsKey(colId);
     final isNumber = spec?.kind == CellKind.number;
     final label = Text(
@@ -55,8 +55,9 @@ class HeaderLabel extends StatelessWidget {
       textAlign: isNumber ? TextAlign.right : TextAlign.left,
     );
     return Row(
-      mainAxisAlignment:
-          isNumber ? MainAxisAlignment.end : MainAxisAlignment.start,
+      mainAxisAlignment: isNumber
+          ? MainAxisAlignment.end
+          : MainAxisAlignment.start,
       children: [
         Expanded(child: label),
         if (hasFilter)
